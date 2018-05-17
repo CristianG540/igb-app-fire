@@ -47,7 +47,7 @@ export class MyApp {
       (user: User) => {
         // debugger;
         if (user && authServ.userSession) {
-          this.rootPage = HomePage;
+          this.rootPage = 'TabsPage';
         } else {
           this.rootPage = LoginPage;
         }

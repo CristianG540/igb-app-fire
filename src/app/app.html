@@ -5,11 +5,11 @@
       <!--material-design-background-->
       <!--<img class="user-avatar round" [src]="chosenPicture || placeholder" onerror="this.src='assets/img/avatar/girl-avatar.png'"
       />-->
-      <p class="name"> Id usuario </p>
-      <p class="e-mail"> email </p>
-      <p class="e-mail">Asesor: asesor id</p>
-      <p *ngIf="this.authService?.nitCliente" class="e-mail">NIT: nit cliente</p>
-      <p class="e-mail" (click)="pressToEgg($event)">Version: version</p>
+      <p class="name"> {{ authServ?.userData?.username }} </p>
+      <p class="e-mail"> {{ authServ?.userData?.email }} </p>
+      <p class="e-mail">Asesor: {{ authServ?.userData?.idAsesor }}</p>
+      <p *ngIf="authServ?.userData?.nitCliente" class="e-mail">NIT: {{ authServ?.userData?.nitCliente }}</p>
+      <p class="e-mail" (click)="pressToEgg($event)">Version: 1.0.0</p>
     </div>
     <ion-list no-lines>
       <button menuClose="left" ion-item detail-none (click)="reloadApp()">
