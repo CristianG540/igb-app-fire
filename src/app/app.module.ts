@@ -8,6 +8,7 @@ import { StatusBar } from '@ionic-native/status-bar';
 import { MyApp } from './app.component';
 import { HomePage } from '../pages/home/home';
 import { LoginPage } from '../pages/login/login';
+import { SplashPage } from '../pages/splash/splash';
 
 // Providers
 import { ConfigProvider } from '../providers/config/config';
@@ -24,6 +25,7 @@ import { AuthProvider } from '../providers/auth/auth';
     MyApp,
     HomePage,
     LoginPage,
+    SplashPage,
   ],
   imports: [
     BrowserModule,
@@ -37,6 +39,7 @@ import { AuthProvider } from '../providers/auth/auth';
     MyApp,
     HomePage,
     LoginPage,
+    SplashPage,
   ],
   providers: [
     StatusBar,

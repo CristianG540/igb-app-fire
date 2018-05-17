@@ -6,6 +6,7 @@ import { SplashScreen } from '@ionic-native/splash-screen';
 // Pages
 import { HomePage } from '../pages/home/home';
 import { LoginPage } from '../pages/login/login';
+import { SplashPage } from '../pages/splash/splash';
 
 import { Subscription } from 'rxjs/Subscription';
 
@@ -21,7 +22,7 @@ import { User } from '../providers/auth/model/user';
 })
 export class MyApp {
 
-  private rootPage: any = LoginPage;
+  private rootPage: any = SplashPage;
   private authObserver: Subscription;
   @ViewChild('content') private content: NavController;
 
