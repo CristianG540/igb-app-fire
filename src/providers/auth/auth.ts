@@ -116,8 +116,11 @@ export class AuthProvider {
       this._userRef = this.angularFireDB.object(`users/${user.uid}`);
       this.setUserData({
         uid: user.uid,
+        name: d.name,
+        username: d.username,
         email: user.email,
-        catchPhrase: 'perrito azul',
+        idAsesor: d.asesor_id,
+        nitCliente: d.nit_cliente,
         verificationEmailIsSend: false,
       })
 
