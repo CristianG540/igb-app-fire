@@ -9,6 +9,8 @@ import { MyApp } from './app.component';
 import { HomePage } from '../pages/home/home';
 import { LoginPage } from '../pages/login/login';
 import { SplashPage } from '../pages/splash/splash';
+import { ClientesPage } from '../pages/clientes/clientes';
+import { CarteraPage } from '../pages/cartera/cartera';
 
 // Providers
 import { ConfigProvider } from '../providers/config/config';
@@ -26,6 +28,8 @@ import { AuthProvider } from '../providers/auth/auth';
     HomePage,
     LoginPage,
     SplashPage,
+    ClientesPage,
+    CarteraPage,
   ],
   imports: [
     BrowserModule,
@@ -40,6 +44,8 @@ import { AuthProvider } from '../providers/auth/auth';
     HomePage,
     LoginPage,
     SplashPage,
+    ClientesPage,
+    CarteraPage,
   ],
   providers: [
     StatusBar,

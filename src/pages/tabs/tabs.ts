@@ -3,6 +3,8 @@ import { IonicPage, NavController } from 'ionic-angular';
 
 // Pages
 import { HomePage } from '../home/home';
+import { ClientesPage } from '../clientes/clientes';
+import { CarteraPage } from '../cartera/cartera';
 
 // Providers
 import { AuthProvider } from '../../providers/auth/auth';
@@ -17,10 +19,10 @@ export class TabsPage {
   inicioRoot = HomePage;
   marcasRoot = 'MarcasPage';
   carritoRoot = 'CarritoPage';
-  clientesRoot = 'ClientesPage';
+  clientesRoot = ClientesPage;
   ordenesRoot = 'OrdenesPage';
   buscarRoot = 'BuscarPage';
-  carteraRoot = 'CarteraPage';
+  carteraRoot = CarteraPage;
 
   constructor(
     private navCtrl: NavController,
