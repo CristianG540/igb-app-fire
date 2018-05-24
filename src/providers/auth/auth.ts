@@ -60,56 +60,6 @@ export class AuthProvider {
     this._userRef.update(data);
   }
 
-  /*public login(
-    credentials: { username: string, password: string }
-  ): Promise<any> {
-    return superlogin.login(credentials)
-  }
-
-  public logout(): Promise<any>{
-    let loading = this.util.showLoading();
-
-    return new Promise((resolve, reject)=>{
-      this.isOnline()
-        .then(res=>{
-
-          if( _.has(res, 'status') && res.status == 'ok' ){
-            return superlogin.logout();
-          }else{
-            throw "El api de autenticacion no esta disponible";
-          }
-        })
-        .then( () => {
-          this.removeTokenJosefa().catch(err=>{
-            console.error('error al eliminar el token de josefa',err);
-            Raven.captureException( new Error(`error al eliminar el token de josefa: ${JSON.stringify(err)}`), {
-              extra: err
-            } );
-          })
-          Raven.setUserContext();
-          loading.dismiss();
-          resolve();
-        })
-        .catch(err=>{
-
-          loading.dismiss();
-          console.error('error en el logout',err);
-          Raven.captureException( new Error(`error en el logout: ${JSON.stringify(err)}`), {
-            extra: err
-          } );
-          //if(err.ok == false || err.message == "Network Error"){
-            this.alertCtrl.create({
-              title: "Ocurrio un error.",
-              message: "Debe estar conectado a la red para desconectarse.",
-              buttons: ['Ok']
-            }).present();
-          //}
-          reject();
-        })
-
-    })
-  }*/
-
   public register( d ): Promise<any> {
     return this.angularFireAuth.auth.createUserWithEmailAndPassword(d.email, d.password).then(user => {
 

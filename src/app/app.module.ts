@@ -21,6 +21,8 @@ import { AngularFireDatabaseModule, AngularFireDatabase } from 'angularfire2/dat
 import { AngularFireAuthModule } from 'angularfire2/auth';
 import { SongProvider } from '../providers/song/song';
 import { AuthProvider } from '../providers/auth/auth';
+import { ProductosProvider } from '../providers/productos/productos';
+import { CarritoProvider } from '../providers/carrito/carrito';
 
 @NgModule({
   declarations: [
@@ -55,6 +57,8 @@ import { AuthProvider } from '../providers/auth/auth';
     ConfigProvider,
     SongProvider,
     AuthProvider,
+    ProductosProvider,
+    CarritoProvider,
   ],
 })
 export class AppModule {}

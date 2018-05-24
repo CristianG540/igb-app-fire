@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { LoadingController, Loading } from 'ionic-angular';
+import { LoadingController, Loading, AlertController, ToastController } from 'ionic-angular';
 
 @Injectable()
 export class ConfigProvider {
@@ -15,6 +15,8 @@ export class ConfigProvider {
 
   constructor(
     private loadingCtrl: LoadingController,
+    private alertCtrl: AlertController,
+    private toastCtrl: ToastController,
   ) {
   }
 
@@ -24,6 +26,53 @@ export class ConfigProvider {
     });
     loading.present();
     return loading;
+  }
+
+  /**
+   * Esta funcion me crea una alerta con un input para preguntarle al
+   * usuario cuantas unidades del producto va a agregar al carrito
+   *
+   * @param {*} handler este parametro recibe una funcion con un parametro data que recibe
+   * la cantidad que el usuario ingreso en el input
+   * @memberof Config
+   */
+  public promptAlertCant(handler: any): void {
+    this.alertCtrl.create({
+      title: 'Agregar cantidad',
+      enableBackdropDismiss: false,
+      inputs: [{
+        name: 'txtCantidad',
+        id: 'idTxtCant',
+        type: 'number',
+        placeholder: 'Cantidad',
+      }],
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel',
+        },
+        {
+          text: 'Agregar',
+          handler: handler,
+        },
+      ],
+    })
+    .present()
+    .then( () => {
+      const firstInput: any = document.querySelector('ion-alert input');
+      firstInput.focus();
+      return;
+    });
+  }
+
+  public showToast(msg: string): void {
+    this.toastCtrl.create({
+      message: msg,
+      duration: 3000,
+      position: 'top',
+      showCloseButton: false,
+      closeButtonText: 'cerrar',
+    }).present();
   }
 
 }

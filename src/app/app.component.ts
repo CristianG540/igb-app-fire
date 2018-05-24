@@ -22,6 +22,9 @@ import { User } from '../providers/auth/model/user';
 })
 export class MyApp {
 
+  // como pagina principal asigno una pagina vacia para hacer una funcion
+  // parecida a un splas screen mientras el servicio de autenticacion inicia y escoge
+  // la pagina adecuada
   private rootPage: any = SplashPage;
   private authObserver: Subscription;
   @ViewChild('content') private content: NavController;
