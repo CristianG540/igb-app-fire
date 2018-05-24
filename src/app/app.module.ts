@@ -59,6 +59,7 @@ import { CarritoProvider } from '../providers/carrito/carrito';
     AuthProvider,
     ProductosProvider,
     CarritoProvider,
+    CarritoProvider,
   ],
 })
 export class AppModule {}

@@ -5,6 +5,7 @@ import { IonicPage, NavController, NavParams, ToastController } from 'ionic-angu
 import { ProductosProvider } from '../../providers/productos/productos';
 import { ConfigProvider } from '../../providers/config/config';
 import { AuthProvider } from '../../providers/auth/auth';
+import { CarritoProvider } from '../../providers/carrito/carrito';
 
 // Models
 import { Producto } from '../../providers/productos/models/producto';
@@ -23,6 +24,7 @@ export class BuscarPage {
     private navParams: NavParams,
     private prodsServ: ProductosProvider,
     private authServ:  AuthProvider,
+    private cartService: CarritoProvider,
     private util: ConfigProvider,
   ) {
     this.prodsServ.init();

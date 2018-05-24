@@ -8,6 +8,7 @@ import { CarteraPage } from '../cartera/cartera';
 
 // Providers
 import { AuthProvider } from '../../providers/auth/auth';
+import { CarritoProvider } from '../../providers/carrito/carrito';
 
 @IonicPage()
 @Component({
@@ -25,9 +26,13 @@ export class TabsPage {
   carteraRoot = CarteraPage;
 
   constructor(
-    private navCtrl: NavController,
+    private cartService: CarritoProvider,
     private authServ: AuthProvider,
   ) {
+  }
+
+  public get itemsCart(): number {
+    return this.cartService.carItems.length;
   }
 
 }
