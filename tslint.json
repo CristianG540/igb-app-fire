@@ -63,9 +63,7 @@
       "single"
     ],
     "radix": true,
-    "semicolon": [
-      "always"
-    ],
+    "semicolon": true,
     "triple-equals": [
       true,
       "allow-null-check"
@@ -91,18 +89,6 @@
       "check-separator",
       "check-type"
     ],
-    "directive-selector": [
-      true,
-      "attribute",
-      "ngx",
-      "camelCase"
-    ],
-    "component-selector": [
-      true,
-      "element",
-      "ngx",
-      "kebab-case"
-    ],
     "ban": [
       true,
       "eval",
@@ -113,13 +99,6 @@
         "message": "please don't"
       }
     ],
-    "use-input-property-decorator": true,
-    "use-output-property-decorator": true,
-    "no-output-rename": true,
-    "use-life-cycle-interface": true,
-    "use-pipe-transform-interface": true,
-    "component-class-suffix": true,
-    "directive-class-suffix": true
   },
   "rulesDirectory": [
     "node_modules/tslint-eslint-rules/dist/rules"

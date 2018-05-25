@@ -6,8 +6,12 @@ import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Subscription } from 'rxjs/Subscription';
 import 'rxjs/add/operator/switchMap';
 
+// Libs terceros
+import * as _ from 'lodash';
+
 // AngularFire - Firebase
 import { AngularFireDatabase, AngularFireList } from 'angularfire2/database';
+import * as firebase from 'firebase';
 
 // Models
 import { Producto } from './models/producto';
@@ -15,7 +19,6 @@ import { Producto } from './models/producto';
 @Injectable()
 export class ProductosProvider {
 
-  private _prodsRef: AngularFireList<Producto>;
   public productos: Producto[];
   public sku$: BehaviorSubject<string|null>;
 
@@ -23,7 +26,6 @@ export class ProductosProvider {
     private angularFireDB: AngularFireDatabase,
     private evts: Events,
   ) {
-    this._prodsRef = this.angularFireDB.list(`products/`, ref => ref.orderByKey());
   }
 
   public init (): void {
@@ -45,17 +47,42 @@ export class ProductosProvider {
     });
   }
 
-  /**
-   *
-   * este metodo es el encargado de hacer funcionar la busqueda de los productos
-   * mediante el sku
-   *
-   * @param {string} query
-   * @memberof ProductosProvider
-   */
-  public searchAutocomplete(query: string): void {
-    query = (query) ? query.toUpperCase() : '';
+  public async fetchProdsByids( ids: string[] ): Promise<Producto[]> {
 
+    const prodPromises: Promise<any>[] = _.map(ids, (v, k, l) => {
+      return firebase.database().ref(`products/${v}`).once('value');
+    })
+
+    const prodsSnapshots = await Promise.all(prodPromises);
+
+    return _.map(prodsSnapshots, (snapshot: any) => {
+
+      const producto: Producto = snapshot.val();
+
+      /**
+       * esta validacion la hago por si se elimina un producto de la bd
+       * por falta de existencias, a veces pasaba que si habia un producto
+       * en el carrito y casualmente se elimina, ocurria un error donde
+       * no se encontraba el _id
+       */
+      if ( _.has(producto, '_id')) {
+        return producto;
+      } else {
+        return new Producto(
+          snapshot.key,
+          'producto agotado',
+          'producto agotado',
+          'https://www.igbcolombia.com/app/www/assets/img/logo/logo_igb_small.png',
+          null,
+          '',
+          'UND',
+          0,
+          0,
+          '',
+        );
+      }
+
+    });
   }
 
 }

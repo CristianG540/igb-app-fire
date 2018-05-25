@@ -15,6 +15,27 @@
 // for the .md, .ios, or .wp mode classes. The mode class is
 // automatically applied to the <body> element in the app.
 
+.car-badge {
+  position: absolute;
+  top: -5px;
+  left: 18px;
+}
+
+.icon-5x {
+  font-size: 100px;
+}
+
+.round {
+  border-radius: 50%;
+}
+
+.red {
+  color: #ff0000 !important;
+}
+.green {
+  color: #00ff14 !important;
+}
+
 // Material Design Sidemenu
 #menu-material {
   .menu-header {

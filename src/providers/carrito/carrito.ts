@@ -100,7 +100,6 @@ export class CarritoProvider {
     return this._db.allDocs({
       include_docs: true,
     }).then( res => {
-      debugger;
       this._carItems = res.rows.map((row) => {
         return {
           _id : row.doc._id,
@@ -273,6 +272,56 @@ export class CarritoProvider {
   }
   /** ********************** Fin Manejo del tema de bogas timsum ********************************* */
 
+
+  public deleteItem(prod: Producto): Promise<any>{
+
+    let carItemIndex = cg.binarySearch(
+      this._carItems,
+      '_id',
+      prod._id
+    );
+    return this._db.remove(this._carItems[carItemIndex])
+      .then(res=>{
+        return res;
+      });
+  }
+
+  /**
+   * Busco el producto en los items del carrito para saber la cantidad que se ha
+   * pedido de cada producto
+   *
+   * @private
+   * @param {Producto} prod
+   * @returns {number}
+   * @memberof CarritoPage
+   */
+  public getProdCant(prod: Producto): number {
+    const carItemIndex = cg.binarySearch(
+      this.carItems,
+      '_id',
+      prod._id,
+    );
+    try {
+      return this.carItems[carItemIndex].cantidad
+    } catch (err) {
+      return 0
+    }
+
+  }
+
+  public setProdCant(cantPedido: number, prod: Producto): void {
+
+    const carItemIndex = cg.binarySearch(
+      this.carItems,
+      '_id',
+      prod._id,
+    );
+    this._carItems[carItemIndex].cantidad = cantPedido;
+    this._carItems[carItemIndex].totalPrice = prod.precio * cantPedido;
+    this._db.put(this._carItems[carItemIndex])
+      .catch(err => console.error('Error setProdCant carrito_provider.ts', err))
+  }
+
   /**
    * Getter que me trae todos los productos en el carrito
    * un array q contiene objetos con el sku del producto
@@ -298,4 +347,41 @@ export class CarritoProvider {
   public get carIdItems(): any {
     return _.map(this._carItems, '_id');
   }
+
+  /**
+   * Getter que me trae el total del pedido sin en el iva
+   *
+   * @readonly
+   * @type {number}
+   * @memberof CarritoProvider
+   */
+  public get subTotalPrice() : number {
+    return _.reduce(this._carItems, (acum, item: CarItem )=>{
+      return acum + item.totalPrice;
+    }, 0);
+  }
+
+  /**
+   * getter recupera el iva del pedido
+   *
+   * @readonly
+   * @type {number}
+   * @memberof CarritoProvider
+   */
+  public get ivaPrice() : number {
+    return this.subTotalPrice*19/100;
+  }
+
+  /**
+   * Getter que me recupera el total del valor de los productos en el carrito
+   * incluyendo el iva
+   *
+   * @readonly
+   * @type {number}
+   * @memberof CarritoProvider
+   */
+  public get totalPrice() : number {
+    return this.subTotalPrice + this.ivaPrice;
+  }
+
 }
