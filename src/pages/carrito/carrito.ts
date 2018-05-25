@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { IonicPage, Events } from 'ionic-angular';
+import { IonicPage, Events, AlertController } from 'ionic-angular';
 
 // Models
 import { Producto } from '../../providers/productos/models/producto';
@@ -17,8 +17,10 @@ import { ConfigProvider } from '../../providers/config/config';
 export class CarritoPage {
 
   private _prods: Producto[] = [];
+  private productoPage: string = 'ProductoPage';
 
   constructor(
+    private alertCtrl: AlertController,
     private evts: Events,
     private cartServ: CarritoProvider,
     private prodServ: ProductosProvider,
@@ -56,6 +58,32 @@ export class CarritoPage {
         loading.dismiss();
         console.error('Error deleteItem carrito_page.ts', err)
       })
+  }
+
+  private deleteDb(): void {
+
+    this.alertCtrl.create({
+      title: 'Esta seguro de borrar todo el carrito ?',
+      enableBackdropDismiss: false,
+      buttons: [
+        {
+          text: 'No',
+          role: 'cancel'
+        },
+        {
+          text: 'Si',
+          handler: () => {
+            this.cartServ.destroyDB(true)
+              .catch(err => console.error('error deleteDB carrito_page.ts'));
+          }
+        }
+      ]
+    }).present();
+
+  }
+
+  private trackByProds(index: number, prod: Producto): string {
+    return prod._id;
   }
 
 }

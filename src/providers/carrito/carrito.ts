@@ -287,6 +287,27 @@ export class CarritoProvider {
   }
 
   /**
+   * Esta funcion se encarga de eliminar la base datos del carrito
+   * se usa en varias ocaciones como al finalizar un pedido o al cerrar
+   * la sesion, el parametro init sirve para iniciar de nuevo la base de datos
+   * esto sirve por ejemplo al terminar el pedido que se borra la bd pero se crea
+   * de nuevo para seguir haciendo pedidos
+   *
+   * @param {boolean} [init=false]
+   * @memberof CarritoProvider
+   */
+  public destroyDB(init: boolean = false): Promise<any>{
+    return this._db.destroy().then(() => {
+      this._carItems = [];
+      // Limpio las banderas de las restricciones de productos timsum
+      this.cleanFlags();
+      if(init){
+        return this.initDB();
+      }
+    })
+  }
+
+  /**
    * Busco el producto en los items del carrito para saber la cantidad que se ha
    * pedido de cada producto
    *
