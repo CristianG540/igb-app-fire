@@ -2,7 +2,7 @@
   "rules": {
     "no-duplicate-variable": true,
     "no-unused-variable": [
-      true
+      false
     ],
     "trailing-comma": [
       true,
@@ -98,7 +98,7 @@
         "name": "$",
         "message": "please don't"
       }
-    ],
+    ]
   },
   "rulesDirectory": [
     "node_modules/tslint-eslint-rules/dist/rules"

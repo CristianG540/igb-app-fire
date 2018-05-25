@@ -18,6 +18,7 @@ import { Producto } from '../../providers/productos/models/producto';
 export class BuscarPage {
 
   private autocompleteItems = [];
+  private productoPage = 'ProductoPage';
 
   constructor(
     private navCtrl: NavController,
@@ -70,10 +71,10 @@ export class BuscarPage {
             this.util.showToast(`Solo puede agregar llantas timsum a este pedido`);
           } else {
             loading.dismiss();
-            console.error('error addProd buscar.ts', err)
+            console.error('error addProd buscar.ts', err);
           }
 
-        })
+        });
       } else {
         this.util.showToast(`Hay ${producto.existencias} productos, ingrese una cantidad valida.`);
         return false;

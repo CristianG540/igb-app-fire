@@ -1,12 +1,12 @@
 import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams } from 'ionic-angular';
 
-/**
- * Generated class for the ProductoPage page.
- *
- * See https://ionicframework.com/docs/components/#navigation for more info on
- * Ionic pages and navigation.
- */
+// Models
+import { Producto } from '../../providers/productos/models/producto';
+
+// Providers
+import { ConfigProvider } from '../../providers/config/config';
+import { CarritoProvider } from '../../providers/carrito/carrito';
 
 @IonicPage()
 @Component({
@@ -15,11 +15,55 @@ import { IonicPage, NavController, NavParams } from 'ionic-angular';
 })
 export class ProductoPage {
 
-  constructor(public navCtrl: NavController, public navParams: NavParams) {
+  private producto: Producto;
+
+  constructor(
+    public navCtrl: NavController,
+    public navParams: NavParams,
+    private cartServ: CarritoProvider,
+    private util: ConfigProvider,
+  ) {
+    this.producto = this.navParams.data;
   }
 
-  ionViewDidLoad() {
-    console.log('ionViewDidLoad ProductoPage');
+  private addProd(): void {
+
+    this.util.promptAlertCant(d => {
+      if ( d.txtCantidad && this.producto.existencias >= d.txtCantidad ) {
+
+        const loading = this.util.showLoading();
+        this.cartServ.pushItem({
+          _id: this.producto._id,
+          cantidad: d.txtCantidad,
+          totalPrice: this.producto.precio * d.txtCantidad,
+          titulo: this.producto.titulo,
+        }).then(res => {
+          loading.dismiss();
+          this.util.showToast(`El producto ${res.id} se agrego correctamente`);
+          this.navCtrl.popToRoot();
+        }).catch(err => {
+
+          if (err === 'duplicate') {
+            loading.dismiss();
+            this.util.showToast(`El producto ya esta en el carrito`);
+          } else if (err === 'no_timsum_llantas') {
+            loading.dismiss();
+            this.util.showToast(`No puede agregar llantas timsum a este pedido`);
+          } else if (err === 'timsum_llantas') {
+            loading.dismiss();
+            this.util.showToast(`Solo puede agregar llantas timsum a este pedido`);
+          } else {
+            console.error('Error addProd producto.ts', err);
+          }
+
+        });
+
+      } else {
+        this.util.showToast(`Hay ${this.producto.existencias} productos, ingrese una cantidad valida.`);
+        return false;
+      }
+    });
+
   }
 
 }

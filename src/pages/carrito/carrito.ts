@@ -28,7 +28,7 @@ export class CarritoPage {
   ) {
     this.evts.subscribe('cart:change', () => {
       this.reloadProds();
-      console.log("se lanzo el evento change");
+      console.log('se lanzo el evento change');
     });
   }
 
@@ -43,21 +43,21 @@ export class CarritoPage {
         this._prods = prods.filter(Boolean);
         console.log('prods carrito', this._prods);
       })
-      .catch(err => console.error('Error reloadProds pages/carrito.ts'))
+      .catch(err => console.error('Error reloadProds pages/carrito.ts'));
   }
 
   private deleteItem(prod: Producto): void {
-    let loading = this.util.showLoading();
+    const loading = this.util.showLoading();
     this.cartServ.deleteItem(prod)
-      .then(res=>{
+      .then(res => {
         loading.dismiss();
         this.util.showToast(`El producto ${res.id} se elimino de carrito correctamente`);
-        console.log("prod eliminado carrito", res);
+        console.log('prod eliminado carrito', res);
       })
       .catch(err => {
         loading.dismiss();
-        console.error('Error deleteItem carrito_page.ts', err)
-      })
+        console.error('Error deleteItem carrito_page.ts', err);
+      });
   }
 
   private deleteDb(): void {
@@ -68,16 +68,16 @@ export class CarritoPage {
       buttons: [
         {
           text: 'No',
-          role: 'cancel'
+          role: 'cancel',
         },
         {
           text: 'Si',
           handler: () => {
             this.cartServ.destroyDB(true)
               .catch(err => console.error('error deleteDB carrito_page.ts'));
-          }
-        }
-      ]
+          },
+        },
+      ],
     }).present();
 
   }
