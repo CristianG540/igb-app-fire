@@ -1,15 +1,22 @@
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams, ModalController } from 'ionic-angular';
+import { IonicPage, NavController, NavParams, ModalController, AlertController } from 'ionic-angular';
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 
 // Libs terceros
-import _ from 'lodash';
+import _, { AnyKindOfDictionary } from 'lodash';
+
+// Models
+import { CarItem } from '../../providers/carrito/models/carItem';
+import { Orden } from '../../providers/orden/models/orden';
 
 // Providers
 import { CarritoProvider } from '../../providers/carrito/carrito';
 import { ClientesProvider } from '../../providers/clientes/clientes';
 import { ConfigProvider as cg } from '../../providers/config/config';
 import { AuthProvider } from '../../providers/auth/auth';
+import { GeolocationProvider } from '../../providers/geolocation/geolocation';
+import { OrdenProvider } from '../../providers/orden/orden';
+import { ProductosProvider } from '../../providers/productos/productos';
 
 @IonicPage()
 @Component({
@@ -26,9 +33,14 @@ export class ConfirmarOrdenPage {
   constructor(
     private authServ: AuthProvider,
     private cartServ: CarritoProvider,
+    private ordenServ: OrdenProvider,
+    private prodServ: ProductosProvider,
+    private geolocation: GeolocationProvider,
     private util: cg,
     private fb: FormBuilder,
+    private navCtrl: NavController,
     private modalCtrl: ModalController,
+    private alertCtrl: AlertController,
   ) {
   }
 
@@ -43,6 +55,10 @@ export class ConfirmarOrdenPage {
       observaciones: [''],
       cliente: [this.authServ.userData.nitCliente, Validators.required],
     });
+
+    if ( this.authServ.userData.transportadora ) {
+      this.transportadora = this.authServ.userData.transportadora;
+    }
 
     if ( this.authServ.userData.nitCliente ) {
 
@@ -73,6 +89,154 @@ export class ConfirmarOrdenPage {
       }
     });
     modal.present();
+  }
+
+  private onSubmit(): void {
+    const loading = this.util.showLoading();
+
+    // get current position
+    this.geolocation.getCurrentPosition().then(pos => {
+
+      this.procesarOrden({
+        lat: pos.latitude,
+        lon: pos.longitude,
+        accuracy: pos.accuracy,
+      });
+      loading.dismiss();
+    }).catch( (err) => {
+
+      loading.dismiss();
+      console.error('error gps', err);
+      if (_.has(err, 'code') && err.code === 4 || err.code === 1) {
+        this.alertCtrl.create({
+          title: 'Error.',
+          message: 'Por favor habilite el uso del gps, para poder marcar la posicion del pedido',
+          buttons: ['Ok'],
+        }).present();
+
+      } else {
+        this.procesarOrden();
+        console.error('GPS- onSubmit confirmar_orden.ts - Error al marcar la posicion de pedido 😫: ' + err);
+      }
+    });
+
+  }
+
+  /**
+   * Se encarga de procesar la orden, enviarla a sap, guardarla en el registro en mysql
+   * y guardarla en CouchDB
+   *
+   * @private
+   * @param {any} [position=""] Recibe un objeto con la latitud, longitud y presicion sacada de la
+   * posicion gps del celular, si no se ingresa el objeto el default es un objeto vacio
+   * {
+   *    lat: 213,
+   *    lon: 321,
+   *    accuracy : 20
+   * }
+   * @memberof ConfirmarOrdenPage
+   */
+  private procesarOrden(position: any = ''): void {
+
+    const loading = this.util.showLoading();
+    /**
+     * recupero los items del carrito para guardarlos en la orden
+     */
+    const carItems: CarItem[] = this.cartServ.carItems;
+    let orden: Orden;
+    const observaciones = this.ordenForm.get('observaciones').value;
+    /**
+     * Si el cliente no es nuevo ya sea porque se sabia el nit y lo
+     * ingreso manualmente o desde el buscador de clientes entonces recupero
+     * la info desde el form de estandar y se la asigno a la orden
+     */
+    if (!this.newClientFlag && this.ordenForm.valid) {
+
+      const form = JSON.parse(JSON.stringify(this.ordenForm.value));
+      orden = {
+        _id : Date.now().toString(),
+        nitCliente: form.cliente,
+        observaciones: observaciones,
+        items: carItems,
+        total: this.cartServ.totalPrice,
+        transp: this.transportadora,
+        estado: false,
+        type: 'orden',
+        location: {
+          lat : position.lat ? position.lat : '',
+          lon : position.lon ? position.lon : '',
+        },
+        accuracy: position.accuracy ? position.accuracy : '',
+      };
+    }
+    /**
+     * Si le dio click a la opcion de nuevo cliente entonces oculto el buscador de clientes
+     * y se despliega le formulario para clientes nuevos, que pide el nombre y el nit
+     * recupero los datos y se los asigno a la orden
+     */
+    if (this.newClientFlag && this.newClient.valid) {
+
+      const form = JSON.parse(JSON.stringify(this.newClient.value));
+      orden = {
+        _id : Date.now().toString(),
+        newClient : form,
+        observaciones: observaciones,
+        items: carItems,
+        total: this.cartServ.totalPrice,
+        estado: false,
+        type: 'orden',
+        location: {
+          lat : position.lat,
+          lon : position.lon,
+        },
+        accuracy: position.accuracy,
+      };
+    }
+
+    /**
+     * Guardo la orden en la base de datos
+     */
+    this.ordenServ.pushItem(orden)
+      .then(res => {
+        // Actualizo la cantidad de los productos que se ordenaron
+        return this.prodServ.updateQuantity(carItems);
+      })
+      .then(res => {
+        debugger;
+        /** Vacio el carrito y envio el usuario al tab de ordenes */
+        this.cartServ.destroyDB(true);
+        this.navCtrl.popToRoot();
+        this.navCtrl.parent.select(5);
+        /** *** *** *** *** *** *** *** *** *** *** *** *** ***   */
+
+        loading.dismiss();
+
+        // return this.ordenServ.sendOrdersSap();
+        return new Promise(null);
+
+      })
+      .then( (responses: any) => {
+
+        const failOrders = _.filter(responses.apiRes, (res: any) => {
+          return res.responseApi.code >= 400;
+        });
+        if (failOrders.length > 0) {
+          this.alertCtrl.create({
+            title: 'Advertencia.',
+            message: failOrders.length + ' ordenes no se han podido subir a sap, verifique su conexion a internet y vuelva a intentarlo',
+            buttons: ['Ok'],
+          }).present();
+        } else {
+          this.alertCtrl.create({
+            title: 'Info.',
+            message: 'Las ordenes se subieron correctamente a sap.',
+            buttons: ['Ok'],
+          }).present();
+        }
+      })
+      .catch(err => {
+        console.error('Error procesarOrden confirmar-orden.ts', err);
+      });
   }
 
   /**

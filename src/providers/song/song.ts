@@ -21,7 +21,7 @@ export class SongProvider {
     console.log('Hello SongProvider Provider');
   }
 
-  getAll() {
+  public getAll(): void {
     this.songsRef = this.angularFireDB.list(`songs/${this.authServ.userData.uid}/`);
     const songsObserv = this.songsRef.snapshotChanges().subscribe(
       changes => {

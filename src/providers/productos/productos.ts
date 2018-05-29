@@ -15,6 +15,10 @@ import * as firebase from 'firebase';
 
 // Models
 import { Producto } from './models/producto';
+import { CarItem } from '../carrito/models/carItem';
+
+// Providers
+import { ConfigProvider as cg } from '../config/config';
 
 @Injectable()
 export class ProductosProvider {
@@ -31,9 +35,11 @@ export class ProductosProvider {
   public init (): void {
     this.sku$ = new BehaviorSubject(null);
     const prodsObserv: Observable<any> = this.sku$.switchMap(sku => {
+
       return this.angularFireDB.list(`products/`, ref => {
         return sku ? ref.orderByKey().startAt(sku).endAt(sku + '\uffff').limitToFirst(100) : ref.limitToFirst(100);
       }).valueChanges();
+
     });
 
     const prodsSub: Subscription = prodsObserv.subscribe(
@@ -83,6 +89,28 @@ export class ProductosProvider {
       }
 
     });
+  }
+
+  public updateQuantity(carItems: CarItem[] ): Promise<any> {
+
+    const prodsId = _.map(carItems, '_id');
+    return this.fetchProdsByids(prodsId)
+    .then((prods: Producto[]) => {
+
+      const prodsToUpdate = _.map(prods, (prod: Producto) => {
+        const itemId = cg.binarySearch(carItems, '_id', prod._id);
+        prod.existencias -= carItems[itemId].cantidad;
+        prod.origen = 'app';
+        prod.updated_at = Date.now();
+        return prod;
+      });
+      return prodsToUpdate;
+    })
+    .then( prodsToUpdate => {
+      debugger
+      return new Promise(null);
+    });
+
   }
 
 }

@@ -5,6 +5,11 @@ import { IonicApp, IonicErrorHandler, IonicModule } from 'ionic-angular';
 import { SplashScreen } from '@ionic-native/splash-screen';
 import { StatusBar } from '@ionic-native/status-bar';
 
+// Plugins Ionic
+import { Geolocation } from '@ionic-native/geolocation';
+import { Diagnostic } from '@ionic-native/diagnostic';
+import { LocationAccuracy } from '@ionic-native/location-accuracy';
+
 // Paginas
 import { MyApp } from './app.component';
 import { HomePage } from '../pages/home/home';
@@ -25,6 +30,8 @@ import { AuthProvider } from '../providers/auth/auth';
 import { ProductosProvider } from '../providers/productos/productos';
 import { CarritoProvider } from '../providers/carrito/carrito';
 import { ClientesProvider } from '../providers/clientes/clientes';
+import { GeolocationProvider } from '../providers/geolocation/geolocation';
+import { OrdenProvider } from '../providers/orden/orden';
 
 @NgModule({
   declarations: [
@@ -64,6 +71,11 @@ import { ClientesProvider } from '../providers/clientes/clientes';
     CarritoProvider,
     CarritoProvider,
     ClientesProvider,
+    GeolocationProvider,
+    Geolocation,
+    Diagnostic,
+    LocationAccuracy,
+    OrdenProvider,
   ],
 })
 export class AppModule {}

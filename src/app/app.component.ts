@@ -13,6 +13,7 @@ import { Subscription } from 'rxjs/Subscription';
 // Providers
 import { AuthProvider } from '../providers/auth/auth';
 import { ConfigProvider } from '../providers/config/config';
+import { OrdenProvider } from '../providers/orden/orden';
 
 // Models
 import { User } from '../providers/auth/model/user';
@@ -37,6 +38,7 @@ export class MyApp {
     private menuCrl: MenuController,
     private authServ:  AuthProvider,
     private cgServ: ConfigProvider,
+    private ordenServ: OrdenProvider,
   ) {
 
     platform.ready().then(() => {
@@ -50,13 +52,14 @@ export class MyApp {
       (user: User) => {
         // debugger;
         if (user && authServ.userSession) {
+          this.ordenServ.init();
           this.rootPage = 'TabsPage';
         } else {
           this.rootPage = LoginPage;
         }
       },
       err => console.error('Error subscribe data user- app.component', err),
-    )
+    );
 
   }
 
@@ -74,8 +77,8 @@ export class MyApp {
       // clearInterval(this.util.timerCheckTokenJose); // Paro el timer que verifica el token de josefa no este vencido
     }).catch(err => {
       loading.dismiss();
-      console.error('Error cerrando sesion - app.component', err)
-    })
+      console.error('Error cerrando sesion - app.component', err);
+    });
 
   }
 

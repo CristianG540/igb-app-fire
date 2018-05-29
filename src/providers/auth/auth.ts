@@ -45,18 +45,18 @@ export class AuthProvider {
             }),
           );
         } else {
-          return Observable.of(null)
+          return Observable.of(null);
         }
       },
-    )
+    );
 
   }
 
-  setUserData(data: User) {
+  private setUserData(data: User) {
     this._userRef.set(data);
   }
 
-  updateUserData(data: any) {
+  private updateUserData(data: any) {
     this._userRef.update(data);
   }
 
@@ -72,9 +72,9 @@ export class AuthProvider {
         idAsesor: d.asesor_id,
         nitCliente: d.nit_cliente,
         verificationEmailIsSend: false,
-      })
+      });
 
-    })
+    });
   }
 
   public sendEmailVerification(user): void {
@@ -86,8 +86,8 @@ export class AuthProvider {
         console.log('email verification sent');
         this.updateUserData({
           verificationEmailIsSend: true,
-        })
-      }).catch(err => console.error('Error al enviar el correo de verificacion- AuthProvider', err))
+        });
+      }).catch(err => console.error('Error al enviar el correo de verificacion- AuthProvider', err));
 
     }
 

@@ -99,8 +99,8 @@ export class LoginPage {
     loading.dismiss();
   }).catch(err => {
     loading.dismiss();
-    console.error('Error iniciando sesion - login.ts', err)
-  })
+    console.error('Error iniciando sesion - login.ts', err);
+  });
  }
 
   private launchSignup(): void {

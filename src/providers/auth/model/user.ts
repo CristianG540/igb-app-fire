@@ -7,5 +7,6 @@ export class User {
     public email: number,
     public nitCliente?: number, // si el usuario tiene este nit es un cliente, sino es un asesor
     public verificationEmailIsSend?: boolean,
+    public transportadora?: number,
   ) {}
 }
