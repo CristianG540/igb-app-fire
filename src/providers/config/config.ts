@@ -13,6 +13,8 @@ export class ConfigProvider {
     messagingSenderId: '227096854617',
   };
 
+  static readonly ELASTIC_URL: string = `https://www.gatortyres.com:9209/couchdb1`;
+
   constructor(
     private loadingCtrl: LoadingController,
     private alertCtrl: AlertController,
@@ -83,7 +85,7 @@ export class ConfigProvider {
     let mid: number;
     while (low < high) {
       mid = (low + high) >>> 1; // faster version of Math.floor((low + high) / 2)
-      arr[mid][property] < search ? low = mid + 1 : high = mid
+      arr[mid][property] < search ? low = mid + 1 : high = mid;
     }
     return low;
   }

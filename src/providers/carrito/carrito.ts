@@ -64,7 +64,7 @@ export class CarritoProvider {
                 resolve(res);
               }).catch(err => {
                 reject(err);
-              })
+              });
             }
             break;
           case 'timsum_llantas':
@@ -78,9 +78,9 @@ export class CarritoProvider {
         }
       }).catch(err => {
         reject(err);
-      })
+      });
 
-    })
+    });
 
   }
 
@@ -89,7 +89,7 @@ export class CarritoProvider {
     this._db = new PouchDB('cart');
     this.fetchAndRenderAllDocs()
       .then( res => {
-        this._reactToChanges()
+        this._reactToChanges();
       })
       .catch( err => console.error('Error initDB carrito.ts', err) );
   }
@@ -108,7 +108,7 @@ export class CarritoProvider {
           _rev : row.doc._rev,
         };
       });
-      console.log('_all_docs carrito pouchD', res)
+      console.log('_all_docs carrito pouchD', res);
       return res;
     });
 
@@ -133,7 +133,7 @@ export class CarritoProvider {
           titulo : change.doc.titulo,
           totalPrice : change.doc.totalPrice,
           _rev : change.doc._rev,
-        })
+        });
       }
     })
     .on( 'err', err => console.error('Error _reactToChanges carrito.ts', err) );
@@ -242,11 +242,11 @@ export class CarritoProvider {
     if ( item._id.substring(0, 2) === 'TY' && item.titulo.substring(0, 6) === 'LLANTA' ) {
       await this._db.putIfNotExists({
         _id: '_local/timsum_flag',
-      })
+      });
     } else {
       await this._db.putIfNotExists({
         _id: '_local/not_timsum_flag',
-      })
+      });
     }
 
     return 'ok';
@@ -273,15 +273,15 @@ export class CarritoProvider {
   /** ********************** Fin Manejo del tema de bogas timsum ********************************* */
 
 
-  public deleteItem(prod: Producto): Promise<any>{
+  public deleteItem(prod: Producto): Promise<any> {
 
-    let carItemIndex = cg.binarySearch(
+    const carItemIndex = cg.binarySearch(
       this._carItems,
       '_id',
-      prod._id
+      prod._id,
     );
     return this._db.remove(this._carItems[carItemIndex])
-      .then(res=>{
+      .then(res => {
         return res;
       });
   }
@@ -296,15 +296,15 @@ export class CarritoProvider {
    * @param {boolean} [init=false]
    * @memberof CarritoProvider
    */
-  public destroyDB(init: boolean = false): Promise<any>{
+  public destroyDB(init: boolean = false): Promise<any> {
     return this._db.destroy().then(() => {
       this._carItems = [];
       // Limpio las banderas de las restricciones de productos timsum
       this.cleanFlags();
-      if(init){
+      if (init) {
         return this.initDB();
       }
-    })
+    });
   }
 
   /**
@@ -323,9 +323,9 @@ export class CarritoProvider {
       prod._id,
     );
     try {
-      return this.carItems[carItemIndex].cantidad
+      return this.carItems[carItemIndex].cantidad;
     } catch (err) {
-      return 0
+      return 0;
     }
 
   }
@@ -340,7 +340,7 @@ export class CarritoProvider {
     this._carItems[carItemIndex].cantidad = cantPedido;
     this._carItems[carItemIndex].totalPrice = prod.precio * cantPedido;
     this._db.put(this._carItems[carItemIndex])
-      .catch(err => console.error('Error setProdCant carrito_provider.ts', err))
+      .catch(err => console.error('Error setProdCant carrito_provider.ts', err));
   }
 
   /**
@@ -376,8 +376,8 @@ export class CarritoProvider {
    * @type {number}
    * @memberof CarritoProvider
    */
-  public get subTotalPrice() : number {
-    return _.reduce(this._carItems, (acum, item: CarItem )=>{
+  public get subTotalPrice(): number {
+    return _.reduce(this._carItems, (acum, item: CarItem ) => {
       return acum + item.totalPrice;
     }, 0);
   }
@@ -389,8 +389,8 @@ export class CarritoProvider {
    * @type {number}
    * @memberof CarritoProvider
    */
-  public get ivaPrice() : number {
-    return this.subTotalPrice*19/100;
+  public get ivaPrice(): number {
+    return this.subTotalPrice * 19 / 100;
   }
 
   /**
@@ -401,7 +401,7 @@ export class CarritoProvider {
    * @type {number}
    * @memberof CarritoProvider
    */
-  public get totalPrice() : number {
+  public get totalPrice(): number {
     return this.subTotalPrice + this.ivaPrice;
   }
 

@@ -17,6 +17,8 @@ import { ConfigProvider } from '../../providers/config/config';
 export class CarritoPage {
 
   private _prods: Producto[] = [];
+  // Pages
+  private confirmarOrdenPage: string = 'ConfirmarOrdenPage';
   private productoPage: string = 'ProductoPage';
 
   constructor(

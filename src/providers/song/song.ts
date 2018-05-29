@@ -25,10 +25,10 @@ export class SongProvider {
     this.songsRef = this.angularFireDB.list(`songs/${this.authServ.userData.uid}/`);
     const songsObserv = this.songsRef.snapshotChanges().subscribe(
       changes => {
-        this._songs = changes.map( d => ({ id: d.payload.key, ...d.payload.val() }) )
+        this._songs = changes.map( d => ({ id: d.payload.key, ...d.payload.val() }) );
       },
       err => console.error('error al subs a las canciones', err),
-    )
+    );
     this.evts.subscribe('auth:logout', () => {
       songsObserv.unsubscribe();
     });

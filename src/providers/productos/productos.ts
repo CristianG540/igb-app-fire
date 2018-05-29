@@ -34,14 +34,14 @@ export class ProductosProvider {
       return this.angularFireDB.list(`products/`, ref => {
         return sku ? ref.orderByKey().startAt(sku).endAt(sku + '\uffff').limitToFirst(100) : ref.limitToFirst(100);
       }).valueChanges();
-    })
+    });
 
     const prodsSub: Subscription = prodsObserv.subscribe(
       prods => {
         this.productos = prods;
       },
       err => console.error('error subscripcion productos.ts', err),
-    )
+    );
     this.evts.subscribe('auth:logout', () => {
       prodsSub.unsubscribe();
     });
@@ -51,7 +51,7 @@ export class ProductosProvider {
 
     const prodPromises: Promise<any>[] = _.map(ids, (v, k, l) => {
       return firebase.database().ref(`products/${v}`).once('value');
-    })
+    });
 
     const prodsSnapshots = await Promise.all(prodPromises);
 

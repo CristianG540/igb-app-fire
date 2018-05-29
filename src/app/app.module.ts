@@ -1,5 +1,6 @@
 import { BrowserModule } from '@angular/platform-browser';
 import { ErrorHandler, NgModule } from '@angular/core';
+import { HttpClientModule } from '@angular/common/http'; // angular >5
 import { IonicApp, IonicErrorHandler, IonicModule } from 'ionic-angular';
 import { SplashScreen } from '@ionic-native/splash-screen';
 import { StatusBar } from '@ionic-native/status-bar';
@@ -23,6 +24,7 @@ import { SongProvider } from '../providers/song/song';
 import { AuthProvider } from '../providers/auth/auth';
 import { ProductosProvider } from '../providers/productos/productos';
 import { CarritoProvider } from '../providers/carrito/carrito';
+import { ClientesProvider } from '../providers/clientes/clientes';
 
 @NgModule({
   declarations: [
@@ -35,6 +37,7 @@ import { CarritoProvider } from '../providers/carrito/carrito';
   ],
   imports: [
     BrowserModule,
+    HttpClientModule,
     IonicModule.forRoot(MyApp),
     AngularFireModule.initializeApp(ConfigProvider.firebaseConfig),
     AngularFireDatabaseModule,
@@ -60,6 +63,7 @@ import { CarritoProvider } from '../providers/carrito/carrito';
     ProductosProvider,
     CarritoProvider,
     CarritoProvider,
+    ClientesProvider,
   ],
 })
 export class AppModule {}
