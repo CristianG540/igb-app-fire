@@ -1,9 +1,13 @@
 import { Injectable } from '@angular/core';
-import { LoadingController, Loading, AlertController, ToastController } from 'ionic-angular';
+import { LoadingController, Loading, AlertController, ToastController, Events } from 'ionic-angular';
+import { Storage } from '@ionic/storage';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { map } from 'rxjs/operator/map';
 
 @Injectable()
 export class ConfigProvider {
 
+  static readonly APP_VER: string = '1.0.0';
   static readonly firebaseConfig = {
     apiKey: 'AIzaSyDvspmoR6kHwKFxabc2tMgMG9myJdwizNY',
     authDomain: 'firestore-test-1-todo.firebaseapp.com',
@@ -12,13 +16,19 @@ export class ConfigProvider {
     storageBucket: 'firestore-test-1-todo.appspot.com',
     messagingSenderId: '227096854617',
   };
-
   static readonly ELASTIC_URL: string = `https://www.gatortyres.com:9209/couchdb1`;
+  static readonly JOSEFA_URL: string = 'https://gatortyres.com';
+
+  public onlineOffline: boolean = navigator.onLine;
+  public timerCheckTokenJose: NodeJS.Timer;
 
   constructor(
     private loadingCtrl: LoadingController,
     private alertCtrl: AlertController,
     private toastCtrl: ToastController,
+    private http: HttpClient,
+    private storage: Storage,
+    private evts: Events,
   ) {
   }
 
@@ -75,6 +85,54 @@ export class ConfigProvider {
       showCloseButton: false,
       closeButtonText: 'cerrar',
     }).present();
+  }
+
+  public async checkToken(): Promise<any> {
+    let token: string = '';
+    try {
+      token = await this.storage.get('josefa-token');
+    } catch (e) {
+      console.error('Error al recuperal el token de josefa del storage: ', e);
+      e.statusText = 'Unauthorized';
+      throw new Error(e.statusText);
+    }
+
+    const url: string = ConfigProvider.JOSEFA_URL + '/sap';
+    const options = {
+      headers: new HttpHeaders({
+        'Accept'       : 'application/json',
+        'Content-Type' : 'application/json',
+        'Authorization': 'Bearer ' + token,
+      }),
+    };
+
+    try {
+      const res = await this.http.get( url, options ).pipe(
+      ).toPromise();
+      return res;
+    } catch (e) {
+      console.error('Error al checkear el token de josefa: ', e);
+      throw new Error(e.statusText);
+    }
+
+  }
+
+  public setTimerCheckJosefa(): void {
+    this.timerCheckTokenJose = setInterval( () => {
+
+      if (this.onlineOffline) {
+
+        this.checkToken().then(res => {
+          console.log('estado del api josefa', res);
+        }).catch( (e: Error) => {
+          if (e.message === 'Unauthorized') {
+            this.evts.publish('timer:checkTokenJosefa');
+          }
+        });
+
+      }
+
+    }, 60000 );
   }
 
   // Esta es una version mas rapida del "_.find" de lodash :3

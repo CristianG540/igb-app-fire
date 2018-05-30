@@ -82,20 +82,14 @@ export class LoginPage {
     .catch( err => this.util.errorHandler(err.message, err, loading) )
   }
 
-
-  private loginJosefa(): void {
-    let loading = this.util.showLoading();
-    this.authService.getTokenJosefa()
-    .catch(err=>{
-      this.util.errorHandler(err.message, err, loading);
-    })
-  }
   */
 
  private login(): void {
   const loading = this.cgServ.showLoading();
   const formModel = JSON.parse(JSON.stringify(this.loginForm.value));
   this.authServ.login(formModel.email, formModel.password).then(res => {
+    return this.authServ.getTokenJosefa();
+  }).then(res => {
     loading.dismiss();
   }).catch(err => {
     loading.dismiss();

@@ -1,5 +1,5 @@
 import { Component, ViewChild } from '@angular/core';
-import { Platform, NavController, MenuController } from 'ionic-angular';
+import { Platform, NavController, MenuController, Events } from 'ionic-angular';
 import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
 
@@ -39,6 +39,7 @@ export class MyApp {
     private authServ:  AuthProvider,
     private cgServ: ConfigProvider,
     private ordenServ: OrdenProvider,
+    private evts: Events,
   ) {
 
     platform.ready().then(() => {
@@ -53,6 +54,7 @@ export class MyApp {
         // debugger;
         if (user && authServ.userSession) {
           this.ordenServ.init();
+          this.cgServ.setTimerCheckJosefa();
           this.rootPage = 'TabsPage';
         } else {
           this.rootPage = LoginPage;
@@ -60,6 +62,10 @@ export class MyApp {
       },
       err => console.error('Error subscribe data user- app.component', err),
     );
+
+    this.evts.subscribe('timer:checkTokenJosefa', () => {
+      this.logout();
+    });
 
   }
 
@@ -74,7 +80,7 @@ export class MyApp {
       this.cargarPagina(LoginPage);
       loading.dismiss();
       // clearInterval(this.ordenServ.intervalValOrders); // Paro el timer que verifica las ordenes
-      // clearInterval(this.util.timerCheckTokenJose); // Paro el timer que verifica el token de josefa no este vencido
+      clearInterval(this.cgServ.timerCheckTokenJose); // Paro el timer que verifica el token de josefa no este vencido
     }).catch(err => {
       loading.dismiss();
       console.error('Error cerrando sesion - app.component', err);

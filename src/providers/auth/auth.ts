@@ -1,7 +1,10 @@
 import { Injectable } from '@angular/core';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+import { Storage } from '@ionic/storage';
 import { Observable } from 'rxjs/Observable';
 import { Events } from 'ionic-angular';
 import 'rxjs/add/operator/switchMap';
+import { map, timeout } from 'rxjs/operators';
 
 // AngularFire - Firebase
 import { AngularFireDatabase, AngularFireObject } from 'angularfire2/database';
@@ -9,7 +12,9 @@ import { AngularFireAuth } from 'angularfire2/auth';
 
 // Models
 import { User } from './model/user';
-import { map } from 'rxjs/operators';
+
+// Providers
+import { ConfigProvider as cg } from '../config/config';
 
 @Injectable()
 export class AuthProvider {
@@ -23,7 +28,10 @@ export class AuthProvider {
   constructor(
     private angularFireAuth: AngularFireAuth,
     private angularFireDB: AngularFireDatabase,
+    private util: cg,
     private evts: Events,
+    private storage: Storage,
+    private httpClient: HttpClient,
   ) {
     this.userObservable = this.angularFireAuth.authState.switchMap(
       user => {
@@ -98,8 +106,33 @@ export class AuthProvider {
   }
 
   public logout(): Promise<any> {
-    this.evts.publish('auth:logout', '');
-    return this.angularFireAuth.auth.signOut();
+    return this.removeTokenJosefa().then(res => {
+      this.evts.publish('auth:logout', '');
+      return this.angularFireAuth.auth.signOut();
+    });
+  }
+
+  public async getTokenJosefa(): Promise<any> {
+    const auth: string = 'Basic ' + btoa('admin:admin1234');
+    const options = {
+      headers: new HttpHeaders({
+        'Accept'       : 'application/json',
+        'Content-Type' : 'application/json',
+        'Authorization': auth,
+      }),
+    };
+    const url: string = cg.JOSEFA_URL + '/authenticate';
+
+    const res = await this.httpClient.post<any>( url, '', options ).pipe(
+      timeout(7000),
+    ).toPromise();
+    debugger;
+    return await this.storage.set('josefa-token', res.data.token);
+
+  }
+
+  public removeTokenJosefa(): Promise<any> {
+    return this.storage.remove('josefa-token');
   }
 
 }

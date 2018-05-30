@@ -9,6 +9,7 @@ import { StatusBar } from '@ionic-native/status-bar';
 import { Geolocation } from '@ionic-native/geolocation';
 import { Diagnostic } from '@ionic-native/diagnostic';
 import { LocationAccuracy } from '@ionic-native/location-accuracy';
+import { IonicStorageModule } from '@ionic/storage';
 
 // Paginas
 import { MyApp } from './app.component';
@@ -46,6 +47,10 @@ import { OrdenProvider } from '../providers/orden/orden';
     BrowserModule,
     HttpClientModule,
     IonicModule.forRoot(MyApp),
+    IonicStorageModule.forRoot({
+      name: '_ionicstorage',
+      driverOrder: ['indexeddb', 'sqlite', 'websql'],
+    }),
     AngularFireModule.initializeApp(ConfigProvider.firebaseConfig),
     AngularFireDatabaseModule,
     AngularFireAuthModule,

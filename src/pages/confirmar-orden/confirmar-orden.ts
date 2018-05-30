@@ -212,8 +212,7 @@ export class ConfirmarOrdenPage {
 
         loading.dismiss();
 
-        // return this.ordenServ.sendOrdersSap();
-        return new Promise(null);
+        return this.ordenServ.sendOrdersSap();
 
       })
       .then( (responses: any) => {
