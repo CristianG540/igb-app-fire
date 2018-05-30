@@ -180,16 +180,17 @@ export class ConfirmarOrdenPage {
       orden = {
         _id : Date.now().toString(),
         newClient : form,
+        nitCliente: form.codCliente ? form.codCliente : '',
         observaciones: observaciones,
         items: carItems,
         total: this.cartServ.totalPrice,
         estado: false,
         type: 'orden',
         location: {
-          lat : position.lat,
-          lon : position.lon,
+          lat : position.lat ? position.lat : '',
+          lon : position.lon ? position.lon : '',
         },
-        accuracy: position.accuracy,
+        accuracy: position.accuracy ? position.accuracy : '',
       };
     }
 

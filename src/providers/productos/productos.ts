@@ -90,26 +90,35 @@ export class ProductosProvider {
 
     });
   }
-
-  public updateQuantity(carItems: CarItem[] ): Promise<any> {
-
+  /**
+   * Esta funcion se encarga de actualizar los productos en firebase al crear una orden
+   *
+   * @param {CarItem[]} carItems
+   * @returns {Promise<any>}
+   * @memberof ProductosProvider
+   */
+  public async updateQuantity(carItems: CarItem[] ): Promise<any> {
+    // Declaro la referencia de los productos para actualizarlos mas adelante
+    const prodsRef: AngularFireList<any> = this.angularFireDB.list(`products/`);
+    // en un array guardo solo los ids de los productos del carrito
     const prodsId = _.map(carItems, '_id');
-    return this.fetchProdsByids(prodsId)
-    .then((prods: Producto[]) => {
 
-      const prodsToUpdate = _.map(prods, (prod: Producto) => {
-        const itemId = cg.binarySearch(carItems, '_id', prod._id);
-        prod.existencias -= carItems[itemId].cantidad;
-        prod.origen = 'app';
-        prod.updated_at = Date.now();
-        return prod;
+    // Busco los productos del carrito en firebase por sus ids
+    const productos: Producto[] = await this.fetchProdsByids(prodsId);
+
+    // en un array guardo una a una las promsesas de actualizacion de cada producto
+    const updatePromises: Promise<any>[] = _.map(productos, (prod: Producto) => {
+      const itemId = cg.binarySearch(carItems, '_id', prod._id);
+
+      return prodsRef.update(prod._id, {
+        existencias: prod.existencias - carItems[itemId].cantidad,
+        origen: 'app',
+        updated_at: Date.now(),
       });
-      return prodsToUpdate;
-    })
-    .then( prodsToUpdate => {
-      debugger
-      return new Promise(null);
     });
+
+    // ejecuto todas las promesas del array y devuelvo los valores que devuelven dichas promesas
+    return await Promise.all(updatePromises);
 
   }
 

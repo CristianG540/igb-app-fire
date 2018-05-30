@@ -4,6 +4,6 @@ export class CarItem {
     public cantidad: number,
     public totalPrice?: number,
     public titulo?: string,
-    public _rev?: string
+    public _rev?: string,
   ) {}
 }

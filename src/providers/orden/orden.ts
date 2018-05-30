@@ -45,7 +45,7 @@ export class OrdenProvider {
   }
 
   public pushItem(orden: Orden): Promise<any> {
-    debugger
+    debugger;
     orden.updated_at = Date.now().toString();
     return this.ordenesRef.set(orden._id, orden);
 
