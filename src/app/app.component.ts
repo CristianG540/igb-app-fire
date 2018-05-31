@@ -14,6 +14,7 @@ import { Subscription } from 'rxjs/Subscription';
 import { AuthProvider } from '../providers/auth/auth';
 import { ConfigProvider } from '../providers/config/config';
 import { OrdenProvider } from '../providers/orden/orden';
+import { CarritoProvider } from '../providers/carrito/carrito';
 
 // Models
 import { User } from '../providers/auth/model/user';
@@ -39,6 +40,7 @@ export class MyApp {
     private authServ:  AuthProvider,
     private cgServ: ConfigProvider,
     private ordenServ: OrdenProvider,
+    private cartServ: CarritoProvider,
     private evts: Events,
   ) {
 
@@ -53,6 +55,7 @@ export class MyApp {
       (user: User) => {
         // debugger;
         if (user && authServ.userSession) {
+          this.cartServ.initDB();
           this.ordenServ.init();
           this.cgServ.setTimerCheckJosefa();
           this.rootPage = 'TabsPage';
@@ -81,6 +84,7 @@ export class MyApp {
       loading.dismiss();
       // clearInterval(this.ordenServ.intervalValOrders); // Paro el timer que verifica las ordenes
       clearInterval(this.cgServ.timerCheckTokenJose); // Paro el timer que verifica el token de josefa no este vencido
+      this.cartServ.destroyDB();
     }).catch(err => {
       loading.dismiss();
       console.error('Error cerrando sesion - app.component', err);
