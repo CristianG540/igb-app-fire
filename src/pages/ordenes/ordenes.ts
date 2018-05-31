@@ -1,12 +1,12 @@
 import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams } from 'ionic-angular';
 
-/**
- * Generated class for the OrdenesPage page.
- *
- * See https://ionicframework.com/docs/components/#navigation for more info on
- * Ionic pages and navigation.
- */
+// Models
+import { Orden } from '../../providers/orden/models/orden';
+
+// Providers
+import { OrdenProvider } from '../../providers/orden/orden';
+import { ConfigProvider as cg } from '../../providers/config/config';
 
 @IonicPage()
 @Component({
@@ -15,11 +15,28 @@ import { IonicPage, NavController, NavParams } from 'ionic-angular';
 })
 export class OrdenesPage {
 
-  constructor(public navCtrl: NavController, public navParams: NavParams) {
+  private appVer: string = cg.APP_VER;
+  private ordenesDetallePage = 'OrdenesDetallePage';
+
+  constructor(
+    private navCtrl: NavController,
+    private navParams: NavParams,
+    private ordenServ: OrdenProvider,
+  ) {
   }
 
-  ionViewDidLoad() {
-    console.log('ionViewDidLoad OrdenesPage');
+  public iconOrden(orden: Orden): string {
+    if (orden.estado === 'seen') {
+      return 'eye';
+    }
+    if (orden.error) {
+      return 'warning';
+    }
+    return (orden.estado) ? 'checkmark' : 'time';
+  }
+
+  private trackById(index: number, orden: Orden): string {
+    return orden._id;
   }
 
 }

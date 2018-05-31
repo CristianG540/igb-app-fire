@@ -1,9 +1,15 @@
 import { Injectable } from '@angular/core';
 import { Events } from 'ionic-angular';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+import { Storage } from '@ionic/storage';
+
+/* Maricadas de Rxjs */
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Observable } from 'rxjs/Observable';
 import { Subscription } from 'rxjs/Subscription';
-import { Storage } from '@ionic/storage';
+import { timeout } from 'rxjs/operators/timeout';
+import { map, catchError } from 'rxjs/operators';
+import { forkJoin } from 'rxjs/observable/forkJoin';
 
 // Libs terceros
 import * as _ from 'lodash';
@@ -33,6 +39,7 @@ export class OrdenProvider {
     private angularFireDB: AngularFireDatabase,
     private evts: Events,
     private storage: Storage,
+    private http: HttpClient,
   ) {
     console.log('Hello OrdenProvider Provider');
   }
@@ -92,8 +99,64 @@ export class OrdenProvider {
         user_email     : this.authServ.userData.email,
         total          : orden.total,
       });
+      const options = {
+        headers: new HttpHeaders({
+          'Accept'       : 'application/json',
+          'Content-Type' : 'application/json',
+          'Authorization': 'Bearer ' + token,
+        }),
+      };
+
+      return this.http.post<any>( url, body, options ).pipe(
+        map( (res: Response) => {
+          /**
+           * Si la respuesta de la api no tiene ningun error, y la orden se crea
+           * y entra correctamente a sap devuelvo entonces la respuesta y la orden
+           */
+          return {
+            orden       : orden,
+            responseApi : res,
+          };
+        }),
+        catchError( err => {
+          return Observable.of({
+            orden       : orden,
+            responseApi : err,
+          });
+        }),
+        timeout(7000),
+      );
 
     });
+
+    // Guardo las respuestas que me delvuelve el api sobre los pedidos hechos
+    const ordenesApiRes = await forkJoin(ordenesCalls).toPromise();
+    debugger;
+    const pushItemsRes = await Promise.all(
+      _.map(ordenesApiRes, (res: any, k, l) => {
+        if (res.responseApi.code === 201 && _.has(res.responseApi, 'data.DocumentParams.DocEntry') ) {
+          res.orden.estado = true;
+          res.orden.error = '';
+          res.orden.docEntry = res.responseApi.data.DocumentParams.DocEntry;
+          return this.pushItem(res.orden);
+        } else {
+          let error: any;
+          if ( _.has(res.responseApi, 'data') ) {
+            error = (res.responseApi.data) ? JSON.stringify(res.responseApi.data) : JSON.stringify(res.responseApi);
+          } else {
+            error = JSON.stringify(res.responseApi);
+            res.responseApi.code = 400;
+          }
+          res.orden.error = error;
+          return this.pushItem(res.orden);
+        }
+      }),
+    );
+
+    return {
+      apiRes     : ordenesApiRes,
+      localdbRes : pushItemsRes,
+    };
 
   }
 
@@ -108,5 +171,17 @@ export class OrdenProvider {
     const ordenesPendientes: Orden[] = _.filter(this.ordenes, ['estado', false]);
     return JSON.parse( JSON.stringify(ordenesPendientes) );
   }
+
+  /**
+   * Getter que me trae todas los ordenes
+   *
+   * @readonly
+   * @type {Orden[]}
+   * @memberof OrdenProvider
+   */
+  public get ordenesDesc(): Orden[] {
+    return JSON.parse(JSON.stringify( _.orderBy(this.ordenes, '_id', 'desc') ));
+  }
+
 
 }

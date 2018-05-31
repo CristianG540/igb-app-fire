@@ -216,7 +216,7 @@ export class ConfirmarOrdenPage {
 
       })
       .then( (responses: any) => {
-
+        debugger;
         const failOrders = _.filter(responses.apiRes, (res: any) => {
           return res.responseApi.code >= 400;
         });
