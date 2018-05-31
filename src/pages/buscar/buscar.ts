@@ -28,13 +28,14 @@ export class BuscarPage {
     private cartService: CarritoProvider,
     private util: ConfigProvider,
   ) {
+    debugger
     this.prodsServ.init();
   }
 
   private updateSearch(ev: any): void {
     // const loading = this.util.showLoading();
     // set val to the value of the searchbar
-    const val = ev.target.value;
+    const val = ev.target.value ? ev.target.value : '';
     if (val === '') {
       // loading.dismiss();
       this.autocompleteItems = [];
