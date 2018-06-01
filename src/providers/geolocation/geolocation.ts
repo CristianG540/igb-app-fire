@@ -1,4 +1,6 @@
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
+
 import { Geolocation, GeolocationOptions } from '@ionic-native/geolocation';
 import { Diagnostic } from '@ionic-native/diagnostic';
 import { LocationAccuracy } from '@ionic-native/location-accuracy';
@@ -16,9 +18,7 @@ export class GeolocationProvider {
     private geolocation: Geolocation,
     private diagnostic: Diagnostic,
     private locationAccuracy: LocationAccuracy,
-  ) {
-    console.log('Hello GeolocationProvider Provider');
-  }
+  ) {}
 
   public async getCurrentPosition(): Promise<Coordinates> {
     const geoLocOpts: GeolocationOptions = {

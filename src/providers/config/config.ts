@@ -16,8 +16,14 @@ export class ConfigProvider {
     storageBucket: 'firestore-test-1-todo.appspot.com',
     messagingSenderId: '227096854617',
   };
+  // Url base de la BD de los Clientes en couch
+  static readonly CDB_URL_CLIENTES: string = 'https://www.gatortyres.com:6984/clientes';
+  static readonly CDB_USER: string = 'admin';
+  static readonly CDB_PASS: string = 'admin';
   static readonly ELASTIC_URL: string = `https://www.gatortyres.com:9209/couchdb1`;
   static readonly JOSEFA_URL: string = 'https://gatortyres.com';
+  static readonly G_MAPS_KEY: string = 'AIzaSyAtVh-4gg1RRcS_jUlDtatc6SjwP-5XI70';
+
 
   public onlineOffline: boolean = navigator.onLine;
   public timerCheckTokenJose: NodeJS.Timer;

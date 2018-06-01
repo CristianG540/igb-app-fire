@@ -58,7 +58,6 @@ export class OrdenProvider {
   }
 
   public pushItem(orden: Orden): Promise<any> {
-    debugger;
     orden.updated_at = Date.now().toString();
     return this.ordenesRef.set(orden._id, orden);
   }
@@ -131,7 +130,7 @@ export class OrdenProvider {
 
     // Guardo las respuestas que me delvuelve el api sobre los pedidos hechos
     const ordenesApiRes = await forkJoin(ordenesCalls).toPromise();
-    debugger;
+
     const pushItemsRes = await Promise.all(
       _.map(ordenesApiRes, (res: any, k, l) => {
         if (res.responseApi.code === 201 && _.has(res.responseApi, 'data.DocumentParams.DocEntry') ) {

@@ -53,7 +53,7 @@ export class MyApp {
 
     this.authObserver = authServ.userObservable.subscribe(
       (user: User) => {
-        // debugger;
+
         if (user && authServ.userSession) {
           this.cartServ.initDB();
           this.ordenServ.init();

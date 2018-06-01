@@ -33,6 +33,7 @@ import { CarritoProvider } from '../providers/carrito/carrito';
 import { ClientesProvider } from '../providers/clientes/clientes';
 import { GeolocationProvider } from '../providers/geolocation/geolocation';
 import { OrdenProvider } from '../providers/orden/orden';
+import { CarteraProvider } from '../providers/cartera/cartera';
 
 @NgModule({
   declarations: [
@@ -81,6 +82,8 @@ import { OrdenProvider } from '../providers/orden/orden';
     Diagnostic,
     LocationAccuracy,
     OrdenProvider,
+    GeolocationProvider,
+    CarteraProvider,
   ],
 })
 export class AppModule {}

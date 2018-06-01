@@ -28,7 +28,6 @@ export class BuscarPage {
     private cartService: CarritoProvider,
     private util: ConfigProvider,
   ) {
-    debugger
     this.prodsServ.init();
   }
 

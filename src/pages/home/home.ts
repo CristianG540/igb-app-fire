@@ -16,7 +16,6 @@ export class HomePage {
     private songServ: SongProvider,
     private menuCtrl: MenuController,
   ) {
-    debugger;
     this.menuCtrl.enable(true);
     songServ.getAll();
   }

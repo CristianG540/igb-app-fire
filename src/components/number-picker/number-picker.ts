@@ -33,7 +33,7 @@ export class NumberPickerComponent {
         this.num = this.max;
       }
       this.numChange.emit(this.num);
-    }, 50)
+    }, 50);
 
   }
 

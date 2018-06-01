@@ -126,7 +126,7 @@ export class AuthProvider {
     const res = await this.httpClient.post<any>( url, '', options ).pipe(
       timeout(7000),
     ).toPromise();
-    debugger;
+
     return await this.storage.set('josefa-token', res.data.token);
 
   }

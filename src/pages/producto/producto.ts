@@ -7,6 +7,7 @@ import { Producto } from '../../providers/productos/models/producto';
 // Providers
 import { ConfigProvider } from '../../providers/config/config';
 import { CarritoProvider } from '../../providers/carrito/carrito';
+import { AuthProvider } from '../../providers/auth/auth';
 
 @IonicPage()
 @Component({
@@ -21,6 +22,7 @@ export class ProductoPage {
     public navCtrl: NavController,
     public navParams: NavParams,
     private cartServ: CarritoProvider,
+    private authServ:  AuthProvider,
     private util: ConfigProvider,
   ) {
     this.producto = this.navParams.data;

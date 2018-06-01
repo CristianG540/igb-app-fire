@@ -70,7 +70,7 @@ export class SignupPage {
     }).catch(err => {
       loading.dismiss();
       console.error('error al crear la cuenta- SignupPage', err);
-    })
+    });
 
   }
 
