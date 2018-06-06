@@ -1,6 +1,12 @@
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams, MenuController } from 'ionic-angular';
-import { FormGroup, FormBuilder, Validators  } from '@angular/forms';
+import {
+  IonicPage,
+  NavController,
+  NavParams,
+  MenuController,
+  AlertController,
+} from 'ionic-angular';
+import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 
 // libs terceros
 import Raven from 'raven-js';
@@ -14,7 +20,6 @@ import { ConfigProvider } from '../../providers/config/config';
   templateUrl: 'login.html',
 })
 export class LoginPage {
-
   private loginForm: FormGroup;
   private username: string;
   private password: string;
@@ -24,9 +29,10 @@ export class LoginPage {
   constructor(
     private navCtrl: NavController,
     private menuCtrl: MenuController,
+    private alertCtrl: AlertController,
     private fb: FormBuilder,
     private navParams: NavParams,
-    private authServ:  AuthProvider,
+    private authServ: AuthProvider,
     private cgServ: ConfigProvider,
   ) {
     this.menuCtrl.enable(false);
@@ -87,21 +93,37 @@ export class LoginPage {
 
   */
 
- private login(): void {
-  const loading = this.cgServ.showLoading();
-  const formModel = JSON.parse(JSON.stringify(this.loginForm.value));
-  this.authServ.login(formModel.email, formModel.password).then(res => {
-    return this.authServ.getTokenJosefa();
-  }).then(res => {
-    loading.dismiss();
-  }).catch(err => {
-    loading.dismiss();
-    console.error('Error login - pages/login.ts', err);
-    Raven.captureException( new Error(`Error login - pages/login.ts 🐛: ${JSON.stringify(err)}`), {
-      extra: err,
-    });
-  });
- }
+  private login(): void {
+    const loading = this.cgServ.showLoading();
+    const formModel = JSON.parse(JSON.stringify(this.loginForm.value));
+    this.authServ
+      .login(formModel.email, formModel.password)
+      .then(res => {
+        return this.authServ.getTokenJosefa();
+      })
+      .then(res => {
+        loading.dismiss();
+      })
+      .catch(err => {
+        loading.dismiss();
+
+        if (err.code === 'auth/wrong-password') {
+          this.alertCtrl.create({
+            title: 'Alerta',
+            message: 'La contraseña no es correcta o el usuario no existe',
+            buttons: ['Ok'],
+          }).present();
+        }
+
+        console.error('Error login - pages/login.ts', err);
+        Raven.captureException(
+          new Error(`Error login - pages/login.ts 🐛: ${JSON.stringify(err)}`),
+          {
+            extra: err,
+          },
+        );
+      });
+  }
 
   private launchSignup(): void {
     this.navCtrl.push('SignupPage');
@@ -110,5 +132,4 @@ export class LoginPage {
   private requestAccount(): void {
     this.navCtrl.push('FormNewAccountPage');
   }
-
 }
