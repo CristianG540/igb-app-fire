@@ -1,9 +1,11 @@
 import { Component, ViewChild } from '@angular/core';
-import { Platform, NavController, MenuController, Events } from 'ionic-angular';
+import { Platform, NavController, MenuController, Events, AlertController } from 'ionic-angular';
 import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
 import { Subscription } from 'rxjs/Subscription';
 
+// libs terceros
+import _ from 'lodash';
 import Raven from 'raven-js';
 
 // Pages
@@ -32,11 +34,17 @@ export class MyApp {
   private authObserver: Subscription;
   @ViewChild('content') private content: NavController;
 
+  // guardo el estado del boton para verficar las ordenes
+  // si alguien lo clickea este deshabilita hasta que las ordenes
+  // se envien y sap responda, esto para evitar que envien las ordenes
+  // muchas veces
+  private btnVerifOrdState: boolean = false;
 
   constructor(
     platform: Platform,
     statusBar: StatusBar,
     splashScreen: SplashScreen,
+    private alertCtrl: AlertController,
     private menuCrl: MenuController,
     private authServ:  AuthProvider,
     private cgServ: ConfigProvider,
@@ -107,6 +115,42 @@ export class MyApp {
         extra: err,
       });
     });
+
+  }
+
+  private verificarOrdenes(): void {
+
+    if (this.ordenServ.ordenesPendientes.length > 0) {
+      this.btnVerifOrdState = true;
+      this.ordenServ.sendOrdersSap()
+      .then(responses => {
+        const failOrders = _.filter(responses.apiRes, (res: any) => {
+          return res.responseApi.code >= 400;
+        });
+        if (failOrders.length > 0) {
+          this.alertCtrl.create({
+            title: 'Advertencia.',
+            message: failOrders.length + ' ordenes no se han podido subir a sap, verifique su conexion a internet y vuelva a intentarlo',
+            buttons: ['Ok'],
+          }).present();
+        } else {
+          this.alertCtrl.create({
+            title: 'Info.',
+            message: 'Las ordenes se subieron correctamente a sap.',
+            buttons: ['Ok'],
+          }).present();
+        }
+        console.warn('RESPUESTA DE LAS ORDENES ', responses);
+        this.btnVerifOrdState = false;
+      })
+      .catch(err => {
+        this.btnVerifOrdState = false;
+        console.error('Error verificarOrdenes - app.component', err);
+        Raven.captureException( new Error(`Error verificarOrdenes - app.component 🐛: ${JSON.stringify(err)}`), {
+          extra: err,
+        });
+      });
+    }
 
   }
 
