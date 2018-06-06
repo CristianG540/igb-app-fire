@@ -7,6 +7,6 @@ export class Cartera {
     public cod_vendedor: number,
     public fecha_emision: string,
     public fecha_vencimiento: string,
-    public _rev?: string
+    public _rev?: string,
   ) {}
 }

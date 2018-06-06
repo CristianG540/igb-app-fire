@@ -32,6 +32,7 @@ export class OrdenProvider {
 
   private ordenesRef: AngularFireList<any>;
   public ordenes: Orden[] = [];
+  public intervalValOrders: NodeJS.Timer;
 
   constructor(
     private authServ: AuthProvider,
@@ -159,6 +160,34 @@ export class OrdenProvider {
 
   }
 
+  public setIntervalOrdersSap(): void {
+    this.intervalValOrders = setInterval( () => {
+
+      if (this.ordenesPendientes.length > 0) {
+
+        this.sendOrdersSap()
+        .then(responses => {
+          const failOrders = _.filter(responses.apiRes, (res: any) => {
+            return res.responseApi.code >= 400;
+          });
+          if (failOrders.length > 0) {
+            console.error(failOrders.length + ' ordenes no se han podido subir a sap, verifique su conexion a internet y vuelva a intentarlo');
+          } else {
+            this.util.showToast('Las ordenes se subieron correctamente a sap.');
+          }
+          console.warn('RESPUESTA DE LAS ORDENES ', responses);
+        })
+        .catch(err => {
+          if (err.message !== 'No hay conexión, su pedido quedara almacenado en el dispositivo.') {
+            console.error('Error setIntervalOrdersSap provider - orden.ts');
+          }
+        });
+
+      }
+
+    }, 60000 );
+  }
+
   /**
    * Getter que me trae las ordenes pendientes
    *
@@ -179,7 +208,11 @@ export class OrdenProvider {
    * @memberof OrdenProvider
    */
   public get ordenesDesc(): Orden[] {
-    return JSON.parse(JSON.stringify( _.orderBy(this.ordenes, '_id', 'desc') ));
+    if ( this.ordenes ) {
+      return _.orderBy(this.ordenes, '_id', 'desc') ;
+    } else {
+      return [];
+    }
   }
 
 

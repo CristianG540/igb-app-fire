@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { IonicPage, NavController, NavParams, ToastController } from 'ionic-angular';
+import { IonicPage, NavController, NavParams, ToastController, MenuController } from 'ionic-angular';
 
 // Providers
 import { ProductosProvider } from '../../providers/productos/productos';
@@ -22,12 +22,14 @@ export class BuscarPage {
 
   constructor(
     private navCtrl: NavController,
+    private menuCtrl: MenuController,
     private navParams: NavParams,
     private prodsServ: ProductosProvider,
     private authServ:  AuthProvider,
     private cartService: CarritoProvider,
     private util: ConfigProvider,
   ) {
+    this.menuCtrl.enable(true);
     this.prodsServ.init();
   }
 

@@ -57,7 +57,8 @@ export class MyApp {
         if (user && authServ.userSession) {
           this.cartServ.initDB();
           this.ordenServ.init();
-          this.cgServ.setTimerCheckJosefa();
+          this.cgServ.setTimerCheckJosefa(); // inicio el timer que verifica el token de josefa no este vencido
+          this.ordenServ.setIntervalOrdersSap(); // inicio el timer que verifica las ordenes
           this.rootPage = 'TabsPage';
         } else {
           this.rootPage = LoginPage;
@@ -82,7 +83,7 @@ export class MyApp {
     this.authServ.logout().then((d) => {
       this.cargarPagina(LoginPage);
       loading.dismiss();
-      // clearInterval(this.ordenServ.intervalValOrders); // Paro el timer que verifica las ordenes
+      clearInterval(this.ordenServ.intervalValOrders); // Paro el timer que verifica las ordenes
       clearInterval(this.cgServ.timerCheckTokenJose); // Paro el timer que verifica el token de josefa no este vencido
       this.cartServ.destroyDB();
     }).catch(err => {
