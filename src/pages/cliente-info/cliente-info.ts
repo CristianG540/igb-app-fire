@@ -3,6 +3,7 @@ import { IonicPage, NavController, NavParams, ModalController, AlertController }
 
 // librerias terceros
 import _ from 'lodash';
+import Raven from 'raven-js';
 
 // Models
 import { Cliente } from '../../providers/clientes/models/cliente';
@@ -77,7 +78,10 @@ export class ClienteInfoPage {
       this.navCtrl.popToRoot();
     }).catch( (err) => {
       loading.dismiss();
-      console.error('error gps', err);
+      console.error('error setLocation pages/cliente-info.ts', err);
+      Raven.captureException( new Error(`error setLocation pages/cliente-info.ts 🐛: ${JSON.stringify(err)}`), {
+        extra: err,
+      });
       if (_.has(err, 'code') && err.code === 4 || err.code === 1) {
         this.alertCtrl.create({
           title: 'Error.',

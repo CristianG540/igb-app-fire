@@ -14,6 +14,7 @@ import { forkJoin } from 'rxjs/observable/forkJoin';
 // Libs terceros
 import * as _ from 'lodash';
 import * as moment from 'moment';
+import Raven from 'raven-js';
 
 // AngularFire - Firebase
 import { AngularFireDatabase, AngularFireList } from 'angularfire2/database';
@@ -51,7 +52,12 @@ export class OrdenProvider {
       ordenes => {
         this.ordenes = ordenes;
       },
-      err => console.error('error al subs a las ordenes init orden.ts', err),
+      err => {
+        console.error('error al subs a las ordenes init providers/orden.ts', err);
+        Raven.captureException( new Error(`error al subs a las ordenes init providers/orden.ts 🐛: ${JSON.stringify(err)}`), {
+          extra: err,
+        });
+      },
     );
     this.evts.subscribe('auth:logout', () => {
       ordenesObserv.unsubscribe();
@@ -178,9 +184,10 @@ export class OrdenProvider {
           console.warn('RESPUESTA DE LAS ORDENES ', responses);
         })
         .catch(err => {
-          if (err.message !== 'No hay conexión, su pedido quedara almacenado en el dispositivo.') {
-            console.error('Error setIntervalOrdersSap provider - orden.ts');
-          }
+          console.error('Error setIntervalOrdersSap - providers/orden.ts', err);
+          Raven.captureException( new Error(`Error setIntervalOrdersSap - providers/orden.ts 🐛: ${JSON.stringify(err)}`), {
+            extra: err,
+          });
         });
 
       }

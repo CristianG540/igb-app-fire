@@ -21,6 +21,8 @@ import { CarteraPage } from '../pages/cartera/cartera';
 
 // Providers
 import { ConfigProvider } from '../providers/config/config';
+// manejo de errores sentry
+import { SentryErrorHandler } from '../providers/error-handler/sentry-errorhandler';
 
 // Libs terceros
 import { AngularFireModule } from 'angularfire2';
@@ -68,7 +70,7 @@ import { CarteraProvider } from '../providers/cartera/cartera';
   providers: [
     StatusBar,
     SplashScreen,
-    {provide: ErrorHandler, useClass: IonicErrorHandler},
+    {provide: ErrorHandler, useClass: SentryErrorHandler},
     AngularFireDatabase,
     ConfigProvider,
     SongProvider,

@@ -2,6 +2,9 @@ import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams, Loading, LoadingController, Config } from 'ionic-angular';
 import { FormGroup, FormBuilder, Validators, AbstractControl, FormControl, ValidatorFn  } from '@angular/forms';
 
+// libs terceros
+import Raven from 'raven-js';
+
 // Providers
 import { AuthProvider } from '../../providers/auth/auth';
 import { ConfigProvider } from '../../providers/config/config';
@@ -69,7 +72,10 @@ export class SignupPage {
       // this.navCtrl.setRoot(HomePage);
     }).catch(err => {
       loading.dismiss();
-      console.error('error al crear la cuenta- SignupPage', err);
+      console.error('error register - pages/signup.ts', err);
+      Raven.captureException( new Error(`error register - pages/signup.ts 🐛: ${JSON.stringify(err)}`), {
+        extra: err,
+      });
     });
 
   }

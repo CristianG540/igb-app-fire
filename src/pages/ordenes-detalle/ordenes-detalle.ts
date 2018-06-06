@@ -3,6 +3,7 @@ import { IonicPage, NavController, NavParams } from 'ionic-angular';
 
 // libs terceros
 import _ from 'lodash';
+import Raven from 'raven-js';
 
 // Models
 import { Producto } from '../../providers/productos/models/producto';
@@ -54,7 +55,12 @@ export class OrdenesDetallePage {
         });
         loading.dismiss();
       })
-      .catch(err => console.error('Error ionViewDidLoad ordenes-detaller'));
+      .catch(err => {
+        console.error('Error ionViewDidLoad pages/ordenes-detalle.ts', err);
+        Raven.captureException( new Error(`Error ionViewDidLoad pages/ordenes-detalle.ts 🐛: ${JSON.stringify(err)}`), {
+          extra: err,
+        });
+      });
   }
 
 }

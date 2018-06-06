@@ -1,6 +1,9 @@
 import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams } from 'ionic-angular';
 
+// libs terceros
+import Raven from 'raven-js';
+
 // Models
 import { Producto } from '../../providers/productos/models/producto';
 
@@ -55,7 +58,10 @@ export class ProductoPage {
             loading.dismiss();
             this.util.showToast(`Solo puede agregar llantas timsum a este pedido`);
           } else {
-            console.error('Error addProd producto.ts', err);
+            console.error('Error addProd pages/producto.ts', err);
+            Raven.captureException( new Error(`Error addProd pages/producto.ts 🐛: ${JSON.stringify(err)}`), {
+              extra: err,
+            });
           }
 
         });

@@ -6,6 +6,9 @@ import { Events } from 'ionic-angular';
 import 'rxjs/add/operator/switchMap';
 import { map, timeout } from 'rxjs/operators';
 
+// libs terceros
+import Raven from 'raven-js';
+
 // AngularFire - Firebase
 import { AngularFireDatabase, AngularFireObject } from 'angularfire2/database';
 import { AngularFireAuth } from 'angularfire2/auth';
@@ -95,7 +98,12 @@ export class AuthProvider {
         this.updateUserData({
           verificationEmailIsSend: true,
         });
-      }).catch(err => console.error('Error al enviar el correo de verificacion- AuthProvider', err));
+      }).catch(err => {
+        console.error('Error sendEmailVerification- providers/auth.ts', err);
+        Raven.captureException( new Error(`Error sendEmailVerification- providers/auth.ts 🐛: ${JSON.stringify(err)}`), {
+          extra: err,
+        });
+      });
 
     }
 

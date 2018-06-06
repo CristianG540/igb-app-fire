@@ -4,6 +4,9 @@ import { AngularFireDatabase, AngularFireList } from 'angularfire2/database';
 import { Observable } from 'rxjs/Observable';
 import { map } from 'rxjs/operators';
 
+// libs terceros
+import Raven from 'raven-js';
+
 // Providers
 import { AuthProvider } from '../auth/auth';
 
@@ -27,7 +30,12 @@ export class SongProvider {
       changes => {
         this._songs = changes.map( d => ({ id: d.payload.key, ...d.payload.val() }) );
       },
-      err => console.error('error al subs a las canciones', err),
+      err => {
+        console.error('error getAll - providers/song.ts', err);
+        Raven.captureException( new Error(`error getAll - providers/song.ts 🐛: ${JSON.stringify(err)}`), {
+          extra: err,
+        });
+      },
     );
     this.evts.subscribe('auth:logout', () => {
       songsObserv.unsubscribe();

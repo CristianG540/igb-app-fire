@@ -1,6 +1,9 @@
 import { Component } from '@angular/core';
 import { IonicPage, Events, AlertController } from 'ionic-angular';
 
+// libs terceros
+import Raven from 'raven-js';
+
 // Models
 import { Producto } from '../../providers/productos/models/producto';
 
@@ -45,7 +48,12 @@ export class CarritoPage {
         this._prods = prods.filter(Boolean);
         console.log('prods carrito', this._prods);
       })
-      .catch(err => console.error('Error reloadProds pages/carrito.ts'));
+      .catch(err => {
+        console.error('Error reloadProds pages/carrito.ts', err);
+        Raven.captureException( new Error(`Error reloadProds pages/carrito.ts 🐛: ${JSON.stringify(err)}`), {
+          extra: err,
+        });
+      });
   }
 
   private deleteItem(prod: Producto): void {
@@ -58,7 +66,10 @@ export class CarritoPage {
       })
       .catch(err => {
         loading.dismiss();
-        console.error('Error deleteItem carrito_page.ts', err);
+        console.error('Error deleteItem pages/carrito.ts', err);
+        Raven.captureException( new Error(`Error deleteItem pages/carrito.ts 🐛: ${JSON.stringify(err)}`), {
+          extra: err,
+        });
       });
   }
 
@@ -76,7 +87,12 @@ export class CarritoPage {
           text: 'Si',
           handler: () => {
             this.cartServ.destroyDB(true)
-              .catch(err => console.error('error deleteDB carrito_page.ts'));
+              .catch(err => {
+                console.error('error deleteDB pages/carrito.ts', err);
+                Raven.captureException( new Error(`error deleteDB pages/carrito.ts 🐛: ${JSON.stringify(err)}`), {
+                  extra: err,
+                });
+              });
           },
         },
       ],

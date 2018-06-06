@@ -6,6 +6,7 @@ import { map, timeout } from 'rxjs/operators';
 import _ from 'lodash';
 import PouchDB from 'pouchdb';
 import PouchUpsert from 'pouchdb-upsert';
+import Raven from 'raven-js';
 
 // Models
 import { Cliente } from './models/cliente';
@@ -86,8 +87,11 @@ export class ClientesProvider {
 
       return data;
 
-    } catch (error) {
-      console.error('Error buscando clientes online searchCliente cliente.ts: ', error);
+    } catch (err) {
+      console.error('Error searchCliente - providers/clientes.ts ', err);
+      Raven.captureException( new Error(`Error searchCliente - providers/clientes.ts 🐛: ${JSON.stringify(err)}`), {
+        extra: err,
+      });
     }
 
   }

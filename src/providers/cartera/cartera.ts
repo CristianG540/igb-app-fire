@@ -3,6 +3,9 @@ import { Storage } from '@ionic/storage';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { timeout } from 'rxjs/operators';
 
+// libs terceros
+import Raven from 'raven-js';
+
 // Providers
 import { ConfigProvider as cg } from '../config/config';
 import { AuthProvider } from '../../providers/auth/auth';
@@ -65,11 +68,14 @@ export class CarteraProvider {
         .toPromise();
 
       return res;
-    } catch (error) {
-      console.error('Error al buscar en cartera', error);
+    } catch (err) {
+      console.error('Error searchCartera - providers/cartera.ts', err);
+      Raven.captureException( new Error(`Error searchCartera - providers/cartera.ts 🐛: ${JSON.stringify(err)}`), {
+        extra: err,
+      });
       throw new Error(
         'Error en cartera debido a un fallo con la conexion, verifique los datos o busque una red wifi: ' +
-          JSON.stringify(error),
+          JSON.stringify(err),
       );
     }
   }

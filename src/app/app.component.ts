@@ -2,13 +2,14 @@ import { Component, ViewChild } from '@angular/core';
 import { Platform, NavController, MenuController, Events } from 'ionic-angular';
 import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
+import { Subscription } from 'rxjs/Subscription';
+
+import Raven from 'raven-js';
 
 // Pages
 import { HomePage } from '../pages/home/home';
 import { LoginPage } from '../pages/login/login';
 import { SplashPage } from '../pages/splash/splash';
-
-import { Subscription } from 'rxjs/Subscription';
 
 // Providers
 import { AuthProvider } from '../providers/auth/auth';
@@ -59,12 +60,25 @@ export class MyApp {
           this.ordenServ.init();
           this.cgServ.setTimerCheckJosefa(); // inicio el timer que verifica el token de josefa no este vencido
           this.ordenServ.setIntervalOrdersSap(); // inicio el timer que verifica las ordenes
+
+          // Aqui le digo a sentry cual es el usuario q esta usando la app
+          Raven.setUserContext({
+            username: this.authServ.userData.username,
+            email: this.authServ.userData.email,
+            id: this.authServ.userData.uid,
+          });
           this.rootPage = 'TabsPage';
         } else {
+          Raven.setUserContext();
           this.rootPage = LoginPage;
         }
       },
-      err => console.error('Error subscribe data user- app.component', err),
+      err => {
+        console.error('Error subscribe data user- app.component', err);
+        Raven.captureException( new Error(`Error subscribe data user- app.component 🐛: ${JSON.stringify(err)}`), {
+          extra: err,
+        });
+      },
     );
 
     this.evts.subscribe('timer:checkTokenJosefa', () => {
@@ -89,6 +103,9 @@ export class MyApp {
     }).catch(err => {
       loading.dismiss();
       console.error('Error cerrando sesion - app.component', err);
+      Raven.captureException( new Error(`Error cerrando sesion - app.component 🐛: ${JSON.stringify(err)}`), {
+        extra: err,
+      });
     });
 
   }

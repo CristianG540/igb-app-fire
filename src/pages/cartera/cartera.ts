@@ -5,6 +5,7 @@ import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 // Libs terceros
 import _ from 'lodash';
 import * as moment from 'moment';
+import Raven from 'raven-js';
 
 // Providers
 import { CarteraProvider } from '../../providers/cartera/cartera';
@@ -79,7 +80,10 @@ export class CarteraPage {
 
       }).catch( err => {
         this.loading = false;
-        console.error('Error onSubmit cartera.ts', err);
+        console.error('Error onSubmit pages/cartera.ts', err);
+        Raven.captureException( new Error(`Error onSubmit pages/cartera.ts 🐛: ${JSON.stringify(err)}`), {
+          extra: err,
+        });
       });
     }
 

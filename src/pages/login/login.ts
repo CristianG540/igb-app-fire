@@ -2,6 +2,9 @@ import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams, MenuController } from 'ionic-angular';
 import { FormGroup, FormBuilder, Validators  } from '@angular/forms';
 
+// libs terceros
+import Raven from 'raven-js';
+
 // Providers
 import { AuthProvider } from '../../providers/auth/auth';
 import { ConfigProvider } from '../../providers/config/config';
@@ -93,7 +96,10 @@ export class LoginPage {
     loading.dismiss();
   }).catch(err => {
     loading.dismiss();
-    console.error('Error iniciando sesion - login.ts', err);
+    console.error('Error login - pages/login.ts', err);
+    Raven.captureException( new Error(`Error login - pages/login.ts 🐛: ${JSON.stringify(err)}`), {
+      extra: err,
+    });
   });
  }
 

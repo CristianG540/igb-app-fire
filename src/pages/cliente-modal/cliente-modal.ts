@@ -3,6 +3,7 @@ import { IonicPage, NavController, NavParams, ViewController } from 'ionic-angul
 
 // Libs terceros
 import _ from 'lodash';
+import Raven from 'raven-js';
 
 // Providers
 import { ConfigProvider as cg } from '../../providers/config/config';
@@ -64,7 +65,10 @@ export class ClienteModalPage {
       })
       .catch(err => {
         loading.dismiss();
-        console.error('Error updateSearch cliente-modal.ts', err);
+        console.error('Error updateSearch pages/cliente-modal.ts', err);
+        Raven.captureException( new Error(`Error updateSearch pages/cliente-modal.ts 🐛: ${JSON.stringify(err)}`), {
+          extra: err,
+        });
       });
   }
 

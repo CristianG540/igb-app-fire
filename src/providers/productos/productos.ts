@@ -8,6 +8,7 @@ import 'rxjs/add/operator/switchMap';
 
 // Libs terceros
 import * as _ from 'lodash';
+import Raven from 'raven-js';
 
 // AngularFire - Firebase
 import { AngularFireDatabase, AngularFireList } from 'angularfire2/database';
@@ -46,7 +47,12 @@ export class ProductosProvider {
       prods => {
         this.productos = prods;
       },
-      err => console.error('error subscripcion productos.ts', err),
+      err => {
+        console.error('error init - providers/productos.ts', err);
+        Raven.captureException( new Error(`error init - providers/productos.ts 🐛: ${JSON.stringify(err)}`), {
+          extra: err,
+        });
+      },
     );
     this.evts.subscribe('auth:logout', () => {
       prodsSub.unsubscribe();

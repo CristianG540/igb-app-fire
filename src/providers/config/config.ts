@@ -4,6 +4,9 @@ import { Storage } from '@ionic/storage';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { map } from 'rxjs/operator/map';
 
+// libs terceros
+import Raven from 'raven-js';
+
 @Injectable()
 export class ConfigProvider {
 
@@ -44,6 +47,19 @@ export class ConfigProvider {
     });
     loading.present();
     return loading;
+  }
+
+  public errorHandler(err: string, errObj?: any, loading?: Loading): void {
+    if (loading) { loading.dismiss(); }
+    this.alertCtrl.create({
+      title: 'Ocurrio un error.',
+      message: err,
+      buttons: ['Ok'],
+    }).present();
+    console.error('Se presento el error: ', errObj);
+    Raven.captureException( new Error(`Se presento el error 🐛: ${JSON.stringify(errObj)}`), {
+      extra: errObj,
+    });
   }
 
   /**

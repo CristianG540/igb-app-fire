@@ -3,7 +3,8 @@ import { IonicPage, NavController, NavParams, ModalController, AlertController }
 import { FormGroup, FormBuilder, Validators } from '@angular/forms';
 
 // Libs terceros
-import _, { AnyKindOfDictionary } from 'lodash';
+import _ from 'lodash';
+import Raven from 'raven-js';
 
 // Models
 import { CarItem } from '../../providers/carrito/models/carItem';
@@ -106,7 +107,10 @@ export class ConfirmarOrdenPage {
     }).catch( (err) => {
 
       loading.dismiss();
-      console.error('error gps', err);
+      console.error('error onSubmit pages/confirmar-orden.ts', err);
+      Raven.captureException( new Error(`error onSubmit pages/confirmar-orden.ts 🐛: ${JSON.stringify(err)}`), {
+        extra: err,
+      });
       if (_.has(err, 'code') && err.code === 4 || err.code === 1) {
         this.alertCtrl.create({
           title: 'Error.',
@@ -233,7 +237,10 @@ export class ConfirmarOrdenPage {
         }
       })
       .catch(err => {
-        console.error('Error procesarOrden confirmar-orden.ts', err);
+        console.error('Error procesarOrden pages/confirmar-orden.ts', err);
+        Raven.captureException( new Error(`Error procesarOrden pages/confirmar-orden.ts 🐛: ${JSON.stringify(err)}`), {
+          extra: err,
+        });
       });
   }
 

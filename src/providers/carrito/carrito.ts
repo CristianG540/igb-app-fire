@@ -5,6 +5,7 @@ import { Events } from 'ionic-angular';
 import _ from 'lodash';
 import PouchDB from 'pouchdb';
 import PouchUpsert from 'pouchdb-upsert';
+import Raven from 'raven-js';
 
 // Providers
 import { ConfigProvider as cg } from '../../providers/config/config';
@@ -22,9 +23,6 @@ export class CarritoProvider {
   constructor(
     public evts: Events,
   ) {
-    if (!this._db) {
-      this.initDB();
-    }
   }
 
   public pushItem(item: CarItem): Promise<any> {
@@ -91,7 +89,12 @@ export class CarritoProvider {
       .then( res => {
         this._reactToChanges();
       })
-      .catch( err => console.error('Error initDB carrito.ts', err) );
+      .catch( err => {
+        console.error('Error initDB - providers/carrito.ts', err);
+        Raven.captureException( new Error(`Error initDB - providers/carrito.ts 🐛: ${JSON.stringify(err)}`), {
+          extra: err,
+        });
+      });
   }
 
   /** *************** Manejo de el estado de la ui    ********************** */
@@ -136,7 +139,12 @@ export class CarritoProvider {
         });
       }
     })
-    .on( 'err', err => console.error('Error _reactToChanges carrito.ts', err) );
+    .on( 'err', err => {
+      console.error('Error _reactToChanges - providers/carrito.ts', err);
+      Raven.captureException( new Error(`Error _reactToChanges - providers/carrito.ts 🐛: ${JSON.stringify(err)}`), {
+        extra: err,
+      });
+    });
   }
 
   private _onUpdatedOrInserted(newDoc: CarItem): void {
@@ -340,7 +348,12 @@ export class CarritoProvider {
     this._carItems[carItemIndex].cantidad = cantPedido;
     this._carItems[carItemIndex].totalPrice = prod.precio * cantPedido;
     this._db.put(this._carItems[carItemIndex])
-      .catch(err => console.error('Error setProdCant carrito_provider.ts', err));
+      .catch(err => {
+        console.error('Error setProdCant - providers/carrito.ts', err);
+        Raven.captureException( new Error(`Error setProdCant - providers/carrito.ts 🐛: ${JSON.stringify(err)}`), {
+          extra: err,
+        });
+      });
   }
 
   /**

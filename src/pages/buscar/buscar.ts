@@ -1,6 +1,9 @@
 import { Component } from '@angular/core';
 import { IonicPage, NavController, NavParams, ToastController, MenuController } from 'ionic-angular';
 
+// libs terceros
+import Raven from 'raven-js';
+
 // Providers
 import { ProductosProvider } from '../../providers/productos/productos';
 import { ConfigProvider } from '../../providers/config/config';
@@ -73,7 +76,10 @@ export class BuscarPage {
             this.util.showToast(`Solo puede agregar llantas timsum a este pedido`);
           } else {
             loading.dismiss();
-            console.error('error addProd buscar.ts', err);
+            console.error('error addProd - buscar.ts - page', err);
+            Raven.captureException( new Error(`error addProd - buscar.ts - page 🐛: ${JSON.stringify(err)}`), {
+              extra: err,
+            });
           }
 
         });
