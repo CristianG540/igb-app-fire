@@ -5,6 +5,7 @@ import { Events } from 'ionic-angular';
 import _ from 'lodash';
 import PouchDB from 'pouchdb';
 import PouchUpsert from 'pouchdb-upsert';
+import cordovaSqlitePlugin from 'pouchdb-adapter-cordova-sqlite';
 import Raven from 'raven-js';
 
 // Providers
@@ -23,6 +24,23 @@ export class CarritoProvider {
   constructor(
     public evts: Events,
   ) {
+  }
+
+  public initDB() {
+    PouchDB.plugin(PouchUpsert);
+    PouchDB.plugin(cordovaSqlitePlugin);
+    const dbConf = {adapter: 'cordova-sqlite', iosDatabaseLocation: 'default'};
+    this._db = new PouchDB('cart.db', dbConf);
+    this.fetchAndRenderAllDocs()
+      .then( res => {
+        this._reactToChanges();
+      })
+      .catch( err => {
+        console.error('Error initDB - providers/carrito.ts', err);
+        Raven.captureException( new Error(`Error initDB - providers/carrito.ts 🐛: ${JSON.stringify(err)}`), {
+          extra: err,
+        });
+      });
   }
 
   public pushItem(item: CarItem): Promise<any> {
@@ -80,21 +98,6 @@ export class CarritoProvider {
 
     });
 
-  }
-
-  public initDB() {
-    PouchDB.plugin(PouchUpsert);
-    this._db = new PouchDB('cart');
-    this.fetchAndRenderAllDocs()
-      .then( res => {
-        this._reactToChanges();
-      })
-      .catch( err => {
-        console.error('Error initDB - providers/carrito.ts', err);
-        Raven.captureException( new Error(`Error initDB - providers/carrito.ts 🐛: ${JSON.stringify(err)}`), {
-          extra: err,
-        });
-      });
   }
 
   /** *************** Manejo de el estado de la ui    ********************** */
