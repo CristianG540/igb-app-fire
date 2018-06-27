@@ -23,7 +23,8 @@ export class ConfigProvider {
   static readonly CDB_URL_CLIENTES: string = 'https://www.gatortyres.com:6984/clientes';
   static readonly CDB_USER: string = 'admin';
   static readonly CDB_PASS: string = 'admin';
-  static readonly ELASTIC_URL: string = `https://www.gatortyres.com:9209/couchdb1`;
+  static readonly SEARCH_CLIENTS_URL: string = `https://www.gatortyres.com:1339/clientes/igb/search`;
+  static readonly SEARCH_PRODS_URL: string = `https://www.gatortyres.com:1339/prods/igb/search`;
   static readonly JOSEFA_URL: string = 'https://gatortyres.com';
   static readonly G_MAPS_KEY: string = 'AIzaSyAtVh-4gg1RRcS_jUlDtatc6SjwP-5XI70';
 

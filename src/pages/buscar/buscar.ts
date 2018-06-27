@@ -37,15 +37,20 @@ export class BuscarPage {
   }
 
   private updateSearch(ev: any): void {
-    // const loading = this.util.showLoading();
+    const loading = this.util.showLoading();
     // set val to the value of the searchbar
     const val = ev.target.value ? ev.target.value : '';
     if (val === '') {
-      // loading.dismiss();
+      loading.dismiss();
       this.autocompleteItems = [];
       return;
     }
-    this.prodsServ.sku$.next(val.toUpperCase());
+    this.prodsServ.searchAutocomplete(val)
+      .then( (prods: Producto[]) => {
+        loading.dismiss();
+        console.log('Resultados busqueda prods', prods);
+        this.autocompleteItems = prods;
+      }).catch( err => this.util.errorHandler(err.message, err, loading) );
   }
 
   private addProd(producto: Producto): void {

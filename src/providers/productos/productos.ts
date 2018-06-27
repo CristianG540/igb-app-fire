@@ -1,6 +1,9 @@
 import { Injectable } from '@angular/core';
 import { Events } from 'ionic-angular';
 
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
+import { timeout } from 'rxjs/operators';
+
 import { Observable } from 'rxjs/Observable';
 import { BehaviorSubject } from 'rxjs/BehaviorSubject';
 import { Subscription } from 'rxjs/Subscription';
@@ -28,6 +31,7 @@ export class ProductosProvider {
   public sku$: BehaviorSubject<string|null>;
 
   constructor(
+    private http: HttpClient, // angular 5+
     private angularFireDB: AngularFireDatabase,
     private evts: Events,
   ) {
@@ -125,6 +129,35 @@ export class ProductosProvider {
 
     // ejecuto todas las promesas del array y devuelvo los valores que devuelven dichas promesas
     return await Promise.all(updatePromises);
+
+  }
+
+  public async searchAutocomplete(query: string): Promise<Producto[]> {
+    query = (query) ? query.toUpperCase() : '';
+
+    const url: string = cg.SEARCH_PRODS_URL;
+    const params = new HttpParams()
+      .set('keyword', query);
+    const options = {
+      headers: new HttpHeaders({
+        'Accept'       : 'application/json',
+        'Content-Type' : 'application/json',
+      }),
+      params: params,
+    };
+
+    let res: Producto[] = []; // Guardo la respuesta con los productos
+
+    try {
+      res = await this.http.get<Producto[]>( url, options ).pipe(
+        timeout(10000),
+      ).toPromise();
+
+      return res.slice(0, 31);
+
+    } catch (error) {
+      return [];
+    }
 
   }
 

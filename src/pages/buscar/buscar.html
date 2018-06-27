@@ -16,7 +16,7 @@
   <ion-searchbar debounce="3000" cancelButtonText="Cancelar" showCancelButton="true" (ionInput)="updateSearch($event)" placeholder="Busqueda por SKU...">
   </ion-searchbar>
   <ion-list>
-    <ion-item-sliding *ngFor="let item of prodsServ.productos">
+    <ion-item-sliding *ngFor="let item of autocompleteItems">
 
       <ion-item text-wrap>
         <ion-thumbnail item-left>
@@ -24,6 +24,7 @@
         </ion-thumbnail>
         <h2>{{ item._id }}</h2>
         <p>{{ item.titulo }}</p>
+        <p>{{ item.aplicacion }}</p>
         <p *ngIf="!authServ?.userData?.nitCliente">
           <b>Disponibles: </b> {{ item.existencias }} </p>
         <p>

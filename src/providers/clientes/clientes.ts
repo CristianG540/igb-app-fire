@@ -54,10 +54,12 @@ export class ClientesProvider {
      * traer digace fallo de conexion o lo que sea, entonces busco los clientes
      * en la base de datos local
      */
-    const url: string = `${cg.ELASTIC_URL}/_search`;
+
+    const url: string = cg.SEARCH_CLIENTS_URL;
     const params = new HttpParams()
-      .set('q', `doc.nombre_cliente:"${query}"~ AND doc.asesor:"${this.authServ.userData.idAsesor}"`);
-    const options = {
+      .set('keyword', query)
+      .set('asesor', String(this.authServ.userData.idAsesor) );
+      const options = {
       headers: new HttpHeaders({
         'Accept'       : 'application/json',
         'Content-Type' : 'application/json',
@@ -74,17 +76,16 @@ export class ClientesProvider {
     try {
 
       const res = await this.http.get( url, options ).pipe(
-        map((response: any) => {
-          return response;
-        }),
         timeout(5000),
       ).toPromise();
-
+      debugger
       const data = { rows: [] };
-      data.rows = _.map(res.hits.hits, (hit: any) => {
-        return hit._source;
+      data.rows = _.map(res, (hit: any) => {
+        return {
+          doc : hit,
+        };
       });
-
+      debugger
       return data;
 
     } catch (err) {
