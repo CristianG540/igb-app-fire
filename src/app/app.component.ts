@@ -33,7 +33,7 @@ export class MyApp {
   private rootPage: any = SplashPage;
   private authObserver: Subscription;
   @ViewChild('content') private content: NavController;
-
+  private appVer: string = ConfigProvider.APP_VER;
   // guardo el estado del boton para verficar las ordenes
   // si alguien lo clickea este deshabilita hasta que las ordenes
   // se envien y sap responda, esto para evitar que envien las ordenes

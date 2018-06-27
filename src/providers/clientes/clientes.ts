@@ -78,14 +78,14 @@ export class ClientesProvider {
       const res = await this.http.get( url, options ).pipe(
         timeout(5000),
       ).toPromise();
-      debugger
+
       const data = { rows: [] };
       data.rows = _.map(res, (hit: any) => {
         return {
           doc : hit,
         };
       });
-      debugger
+
       return data;
 
     } catch (err) {
