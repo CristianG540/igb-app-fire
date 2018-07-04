@@ -1,5 +1,5 @@
 import { Component, ViewChild } from '@angular/core';
-import { Platform, NavController, MenuController, Events, AlertController } from 'ionic-angular';
+import { Platform, NavController, MenuController, Events, AlertController, App } from 'ionic-angular';
 import { StatusBar } from '@ionic-native/status-bar';
 import { SplashScreen } from '@ionic-native/splash-screen';
 import { Subscription } from 'rxjs/Subscription';
@@ -44,6 +44,7 @@ export class MyApp {
     platform: Platform,
     statusBar: StatusBar,
     splashScreen: SplashScreen,
+    app: App,
     private alertCtrl: AlertController,
     private menuCrl: MenuController,
     private authServ:  AuthProvider,
@@ -58,6 +59,23 @@ export class MyApp {
       // Here you can do any higher level native things you might need.
       statusBar.styleDefault();
       splashScreen.hide();
+    });
+    /**
+     * Cancelo el comportamiento del boton de back por hardware
+     * de los celulares, ya que me estaba produciendo errores en
+     * la base de datos sqlite
+     */
+    platform.registerBackButtonAction(() => {
+
+      const nav = app.getActiveNavs()[0];
+      const activeView = nav.getActive();
+
+      if (nav.canGoBack()) { // Can we go back?
+        nav.pop();
+      } else {
+        console.log('Application exit prevented!');
+      }
+
     });
 
     this.authObserver = authServ.userObservable.subscribe(
