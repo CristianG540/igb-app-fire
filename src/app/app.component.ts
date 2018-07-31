@@ -82,18 +82,24 @@ export class MyApp {
       (user: User) => {
 
         if (user && authServ.userSession) {
-          this.cartServ.initDB()
-          this.ordenServ.init()
-          this.cgServ.setTimerCheckJosefa() // inicio el timer que verifica el token de josefa no este vencido
-          this.ordenServ.setIntervalOrdersSap() // inicio el timer que verifica las ordenes
+
+          if (authServ.userData.idAsesor) {
+            this.cartServ.initDB()
+            this.ordenServ.init()
+            this.cgServ.setTimerCheckJosefa() // inicio el timer que verifica el token de josefa no este vencido
+            this.ordenServ.setIntervalOrdersSap() // inicio el timer que verifica las ordenes
 
           // Aqui le digo a sentry cual es el usuario q esta usando la app
-          Raven.setUserContext({
-            username: this.authServ.userData.username,
-            email: this.authServ.userData.email,
-            id: this.authServ.userData.uid
-          })
-          this.rootPage = 'TabsPage'
+            Raven.setUserContext({
+              username: authServ.userData.username,
+              email: authServ.userData.email,
+              id: authServ.userData.uid
+            })
+            this.rootPage = 'TabsPage'
+          } else {
+            this.rootPage = HomePage
+          }
+
         } else {
           Raven.setUserContext()
           this.rootPage = LoginPage
