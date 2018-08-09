@@ -36,6 +36,7 @@
         "@types/pouchdb-upsert": "^2.2.3",
         "angularfire2": "5.0.0-rc.4",
         "cordova-android": "^7.1.0",
+        "cordova-browser": "^4.1.0",
         "cordova-plugin-device": "^2.0.2",
         "cordova-plugin-geolocation": "^4.0.1",
         "cordova-plugin-ionic-keyboard": "^2.1.2",
@@ -81,7 +82,8 @@
             "cordova-sqlite-storage": {}
         },
         "platforms": [
-            "android"
+            "android",
+            "browser"
         ]
     }
 }
