@@ -142,6 +142,10 @@ export class MyApp {
 
   }
 
+  private reloadApp (): void {
+    window.location.reload()
+  }
+
   private verificarOrdenes (): void {
 
     if (this.ordenServ.ordenesPendientes.length > 0) {
