@@ -16,8 +16,8 @@
 
 
 <ion-content #content>
-  <ion-list [virtualScroll]="_prods" [virtualTrackBy]="trackByProds" [approxItemHeight]="'115px'" [hidden]="cartServ.carItems.length == 0">
-    <ion-item-sliding *virtualItem="let prod">
+  <ion-list [hidden]="cartServ.carItems.length == 0">
+    <ion-item-sliding *ngFor="let prod of _prods">
 
       <ion-item text-wrap>
         <ion-thumbnail item-left>
@@ -54,6 +54,7 @@
 
     </ion-item-sliding>
   </ion-list>
+
   <ion-grid *ngIf="cartServ.carItems.length == 0">
     <ion-row>
       <ion-col text-center class="empty-cart">
@@ -62,6 +63,7 @@
       </ion-col>
     </ion-row>
   </ion-grid>
+
 </ion-content>
 
 
