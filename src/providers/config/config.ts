@@ -10,7 +10,7 @@ import Raven from 'raven-js'
 @Injectable()
 export class ConfigProvider {
 
-  static readonly APP_VER: string = '1.0.5'
+  static readonly APP_VER: string = '1.0.6'
   static readonly firebaseConfig = {
     apiKey: 'AIzaSyDvspmoR6kHwKFxabc2tMgMG9myJdwizNY',
     authDomain: 'firestore-test-1-todo.firebaseapp.com',

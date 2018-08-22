@@ -1,8 +1,7 @@
 {
-  "name": "af2-lists",
-  "version": "1.0.5",
-  "author": "Ionic Framework",
-  "homepage": "http://ionicframework.com/",
+  "name": "igb-online-app",
+  "version": "1.0.6",
+  "author": "CristianG540",
   "private": true,
   "scripts": {
     "clean": "ionic-app-scripts clean",
@@ -66,7 +65,6 @@
     "tslint-config-standard": "^7.1.0",
     "typescript": "~2.6.2"
   },
-  "description": "An Ionic project",
   "cordova": {
     "plugins": {
       "cordova-plugin-geolocation": {
