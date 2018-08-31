@@ -1,97 +1,97 @@
-import { Injectable } from '@angular/core';
-import { Events } from 'ionic-angular';
-import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
-import { Storage } from '@ionic/storage';
+import { Injectable } from '@angular/core'
+import { Events } from 'ionic-angular'
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http'
+import { Storage } from '@ionic/storage'
 
 /* Maricadas de Rxjs */
-import { BehaviorSubject } from 'rxjs/BehaviorSubject';
-import { Observable } from 'rxjs/Observable';
-import { Subscription } from 'rxjs/Subscription';
-import { timeout } from 'rxjs/operators/timeout';
-import { map, catchError } from 'rxjs/operators';
-import { forkJoin } from 'rxjs/observable/forkJoin';
+import { BehaviorSubject } from 'rxjs/BehaviorSubject'
+import { Observable } from 'rxjs/Observable'
+import { Subscription } from 'rxjs/Subscription'
+import { timeout } from 'rxjs/operators/timeout'
+import { map, catchError } from 'rxjs/operators'
+import { forkJoin } from 'rxjs/observable/forkJoin'
 
 // Libs terceros
-import * as _ from 'lodash';
-import * as moment from 'moment';
-import Raven from 'raven-js';
+import * as _ from 'lodash'
+import * as moment from 'moment'
+import Raven from 'raven-js'
 
 // AngularFire - Firebase
-import { AngularFireDatabase, AngularFireList } from 'angularfire2/database';
-import * as firebase from 'firebase';
+import { AngularFireDatabase, AngularFireList } from 'angularfire2/database'
+import * as firebase from 'firebase'
 
 // Models
-import { Orden } from './models/orden';
-import { CarItem } from '../carrito/models/carItem';
+import { Orden } from './models/orden'
+import { CarItem } from '../carrito/models/carItem'
 
 // Providers
-import { AuthProvider } from '../auth/auth';
-import { ConfigProvider as cg } from '../config/config';
+import { AuthProvider } from '../auth/auth'
+import { ConfigProvider as cg } from '../config/config'
 
 @Injectable()
 export class OrdenProvider {
 
-  private ordenesRef: AngularFireList<any>;
-  public ordenes: Orden[] = [];
-  public intervalValOrders: NodeJS.Timer;
+  private ordenesRef: AngularFireList<any>
+  public ordenes: Orden[] = []
+  public intervalValOrders: NodeJS.Timer
 
-  constructor(
+  constructor (
     private authServ: AuthProvider,
     private util: cg,
     private angularFireDB: AngularFireDatabase,
     private evts: Events,
     private storage: Storage,
-    private http: HttpClient,
+    private http: HttpClient
   ) {
-    console.log('Hello OrdenProvider Provider');
+    console.log('Hello OrdenProvider Provider')
   }
 
   public init (): void {
-    this.ordenesRef = this.angularFireDB.list(`orders/${this.authServ.userData.uid}/`);
+    this.ordenesRef = this.angularFireDB.list(`orders/${this.authServ.userData.uid}/`)
     const ordenesObserv = this.ordenesRef.valueChanges().subscribe(
       ordenes => {
-        this.ordenes = ordenes;
+        this.ordenes = ordenes
       },
       err => {
-        console.error('error al subs a las ordenes init providers/orden.ts', err);
-        Raven.captureException( new Error(`error al subs a las ordenes init providers/orden.ts 🐛: ${JSON.stringify(err)}`), {
-          extra: err,
-        });
-      },
-    );
+        console.error('error al subs a las ordenes init providers/orden.ts', err)
+        Raven.captureException(new Error(`error al subs a las ordenes init providers/orden.ts 🐛: ${JSON.stringify(err)}`), {
+          extra: err
+        })
+      }
+    )
     this.evts.subscribe('auth:logout', () => {
-      ordenesObserv.unsubscribe();
-    });
+      ordenesObserv.unsubscribe()
+    })
   }
 
-  public pushItem(orden: Orden): Promise<any> {
-    orden.updated_at = Date.now().toString();
-    return this.ordenesRef.set(orden._id, orden);
+  public pushItem (orden: Orden): Promise<any> {
+    orden.updated_at = Date.now().toString()
+    return this.ordenesRef.set(orden._id, orden)
   }
 
-  public async sendOrdersSap(): Promise<any> {
+  public async sendOrdersSap (): Promise<any> {
 
     if (!this.util.onlineOffline) {
       return Promise.reject({
-        message: 'No hay conexión, su pedido no puede ser procesado.',
-      });
+        message: 'No hay conexión, su pedido no puede ser procesado.'
+      })
     }
 
-    const token = await this.storage.get('josefa-token');
-    const url: string = cg.JOSEFA_URL + '/sap/order';
+    const token = await this.storage.get('josefa-token')
+    const url: string = cg.JOSEFA_URL + '/sap/order'
 
     const ordenesCalls: Observable<any>[] = _.map(this.ordenesPendientes, (orden: Orden) => {
 
       // mapeo los productos de la orden segun el formato del api
-      const items: any = _.map( orden.items, (item: CarItem) => {
+      const items: any = _.map(orden.items, (item: CarItem) => {
         return {
           referencia : item._id,
           cantidad   : item.cantidad,
           titulo     : item.titulo,
           total      : item.totalPrice,
-          descuento  : 0,
-        };
-      });
+          descuento  : 0
+        }
+      })
 
       const body: string = JSON.stringify({
         id             : orden._id,
@@ -104,95 +104,96 @@ export class OrdenProvider {
         asesor_id      : this.authServ.userData.idAsesor,
         user_email     : this.authServ.userData.email,
         total          : orden.total,
-      });
+        tipo_usuario   : (this.authServ.userData.nitCliente) ? 'cliente' : 'asesor'
+      })
       const options = {
         headers: new HttpHeaders({
           'Accept'       : 'application/json',
           'Content-Type' : 'application/json',
-          'Authorization': 'Bearer ' + token,
-        }),
-      };
+          'Authorization': 'Bearer ' + token
+        })
+      }
 
-      return this.http.post<any>( url, body, options ).pipe(
-        map( (res: Response) => {
+      return this.http.post<any>(url, body, options).pipe(
+        map((res: Response) => {
           /**
            * Si la respuesta de la api no tiene ningun error, y la orden se crea
            * y entra correctamente a sap devuelvo entonces la respuesta y la orden
            */
           return {
             orden       : orden,
-            responseApi : res,
-          };
+            responseApi : res
+          }
         }),
-        catchError( err => {
+        catchError(err => {
           return Observable.of({
             orden       : orden,
-            responseApi : err,
-          });
+            responseApi : err
+          })
         }),
-        timeout(7000),
-      );
+        timeout(7000)
+      )
 
-    });
+    })
 
     // Guardo las respuestas que me delvuelve el api sobre los pedidos hechos
-    const ordenesApiRes = await forkJoin(ordenesCalls).toPromise();
+    const ordenesApiRes = await forkJoin(ordenesCalls).toPromise()
 
     const pushItemsRes = await Promise.all(
       _.map(ordenesApiRes, (res: any, k, l) => {
-        if (res.responseApi.code === 201 && _.has(res.responseApi, 'data.DocumentParams.DocEntry') ) {
-          res.orden.estado = true;
-          res.orden.error = '';
-          res.orden.docEntry = res.responseApi.data.DocumentParams.DocEntry;
-          return this.pushItem(res.orden);
+        if (res.responseApi.code === 201 && _.has(res.responseApi, 'data.DocumentParams.DocEntry')) {
+          res.orden.estado = true
+          res.orden.error = ''
+          res.orden.docEntry = res.responseApi.data.DocumentParams.DocEntry
+          return this.pushItem(res.orden)
         } else {
-          let error: any;
-          if ( _.has(res.responseApi, 'data') ) {
-            error = (res.responseApi.data) ? JSON.stringify(res.responseApi.data) : JSON.stringify(res.responseApi);
+          let error: any
+          if (_.has(res.responseApi, 'data')) {
+            error = (res.responseApi.data) ? JSON.stringify(res.responseApi.data) : JSON.stringify(res.responseApi)
           } else {
-            error = JSON.stringify(res.responseApi);
-            res.responseApi.code = 400;
+            error = JSON.stringify(res.responseApi)
+            res.responseApi.code = 400
           }
-          res.orden.error = error;
-          return this.pushItem(res.orden);
+          res.orden.error = error
+          return this.pushItem(res.orden)
         }
-      }),
-    );
+      })
+    )
 
     return {
       apiRes     : ordenesApiRes,
-      localdbRes : pushItemsRes,
-    };
+      localdbRes : pushItemsRes
+    }
 
   }
 
-  public setIntervalOrdersSap(): void {
-    this.intervalValOrders = setInterval( () => {
+  public setIntervalOrdersSap (): void {
+    this.intervalValOrders = setInterval(() => {
 
       if (this.ordenesPendientes.length > 0) {
 
         this.sendOrdersSap()
         .then(responses => {
           const failOrders = _.filter(responses.apiRes, (res: any) => {
-            return res.responseApi.code >= 400;
-          });
+            return res.responseApi.code >= 400
+          })
           if (failOrders.length > 0) {
-            console.error(failOrders.length + ' ordenes no se han podido subir a sap, verifique su conexion a internet y vuelva a intentarlo');
+            console.error(failOrders.length + ' ordenes no se han podido subir a sap, verifique su conexion a internet y vuelva a intentarlo')
           } else {
-            this.util.showToast('Las ordenes se subieron correctamente a sap.');
+            this.util.showToast('Las ordenes se subieron correctamente a sap.')
           }
-          console.warn('RESPUESTA DE LAS ORDENES ', responses);
+          console.warn('RESPUESTA DE LAS ORDENES ', responses)
         })
         .catch(err => {
-          console.error('Error setIntervalOrdersSap - providers/orden.ts', err);
-          Raven.captureException( new Error(`Error setIntervalOrdersSap - providers/orden.ts 🐛: ${JSON.stringify(err)}`), {
-            extra: err,
-          });
-        });
+          console.error('Error setIntervalOrdersSap - providers/orden.ts', err)
+          Raven.captureException(new Error(`Error setIntervalOrdersSap - providers/orden.ts 🐛: ${JSON.stringify(err)}`), {
+            extra: err
+          })
+        })
 
       }
 
-    }, 60000 );
+    }, 60000)
   }
 
   /**
@@ -202,9 +203,9 @@ export class OrdenProvider {
    * @type {Orden[]}
    * @memberof OrdenProvider
    */
-  public get ordenesPendientes(): Orden[] {
-    const ordenesPendientes: Orden[] = _.filter(this.ordenes, ['estado', false]);
-    return JSON.parse( JSON.stringify(ordenesPendientes) );
+  public get ordenesPendientes (): Orden[] {
+    const ordenesPendientes: Orden[] = _.filter(this.ordenes, ['estado', false])
+    return JSON.parse(JSON.stringify(ordenesPendientes))
   }
 
   /**
@@ -214,13 +215,12 @@ export class OrdenProvider {
    * @type {Orden[]}
    * @memberof OrdenProvider
    */
-  public get ordenesDesc(): Orden[] {
-    if ( this.ordenes ) {
-      return _.orderBy(this.ordenes, '_id', 'desc') ;
+  public get ordenesDesc (): Orden[] {
+    if (this.ordenes) {
+      return _.orderBy(this.ordenes, '_id', 'desc')
     } else {
-      return [];
+      return []
     }
   }
-
 
 }
